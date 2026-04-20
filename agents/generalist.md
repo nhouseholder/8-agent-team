@@ -63,7 +63,26 @@ Before acting, classify the task:
 
 ## Context Compaction Protocol
 
-When asked to compact, save state, or when context is getting long:
+**Follow the compactor skill** (`skills/compactor/SKILL.md`) for full protocol. Key points below:
+
+### CRITICAL: Compaction vs Handoff Decision
+| Situation | Action |
+|-----------|--------|
+| **First time context is low** | Compact — fidelity loss is minimal |
+| **After 2+ compactions in a session** | HANDOFF — write handoff.md, start new session |
+| **After 3+ compactions in a session** | STRONGLY RECOMMEND new session |
+| **Complex multi-step task still in progress** | HANDOFF — too much state to survive compaction |
+| **Before spawning large agent on heavy context** | Compact first, then spawn |
+
+### Pre-Compaction Checkpoint (MANDATORY before /compact)
+Write to `~/.claude/projects/<project>/memory/pre_compact_checkpoint.md`:
+- What we were doing (1-2 sentences)
+- Key numbers/data computed this session
+- Decisions made (with rationale)
+- Current progress (done/next/blockers)
+- Files modified this session
+
+**After compaction, first action: re-read this checkpoint file.**
 
 ### What to PRESERVE (always keep):
 - **Current task** — what we're working on right now
@@ -115,11 +134,14 @@ Save to `thoughts/ledgers/CONTINUITY_YYYY-MM-DD_HHMM.md`:
 5. **Discard verbose outputs** — keep conclusions, not intermediate steps
 6. **Ledger before compact** — always save state before context shrinks
 7. **Target: 10-15 lines max** for the summary — if longer, compress more
+8. **Handoff over extended context, always** — never fight compression with rate-limited extended context
+9. **Track compaction count** — mentally count compactions; at 2+, switch to handoff
 
 ### Session Continuity:
 - **On session start**: Read most recent ledger, restore critical context
 - **On session end**: Update ledger, commit changes, report where next session picks up
 - **On context limit approaching**: Proactively compact before hitting the wall
+- **On 2+ compactions**: Write handoff.md and recommend new session
 
 ## Summarization Protocol
 
