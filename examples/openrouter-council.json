@@ -40,27 +40,22 @@
   "agent": {
     "orchestrator": {
       "mode": "primary",
-      "model": "opencode-go/qwen3.6-plus",
       "prompt_file": "agents/orchestrator.md"
     },
     "strategist": {
       "mode": "all",
-      "model": "opencode-go/qwen3.6-plus",
       "prompt_file": "agents/strategist.md"
     },
     "researcher": {
       "mode": "all",
-      "model": "opencode-go/qwen3.6-plus",
       "prompt_file": "agents/researcher.md"
     },
     "designer": {
       "mode": "all",
-      "model": "opencode-go/qwen3.6-plus",
       "prompt_file": "agents/designer.md"
     },
     "auditor": {
       "mode": "all",
-      "model": "opencode-go/qwen3.6-plus",
       "prompt_file": "agents/auditor.md"
     },
     "council": {
@@ -71,7 +66,6 @@
     },
     "generalist": {
       "mode": "all",
-      "model": "opencode-go/qwen3.6-plus",
       "prompt_file": "agents/generalist.md"
     }
   },

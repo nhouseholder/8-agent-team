@@ -40,32 +40,26 @@
   "agent": {
     "orchestrator": {
       "mode": "primary",
-      "model": "opencode-go/qwen3.6-plus",
       "prompt_file": "agents/orchestrator.md"
     },
     "explorer": {
       "mode": "all",
-      "model": "opencode-go/qwen3.6-plus",
       "prompt_file": "agents/explorer.md"
     },
     "strategist": {
       "mode": "all",
-      "model": "opencode-go/qwen3.6-plus",
       "prompt_file": "agents/strategist.md"
     },
     "researcher": {
       "mode": "all",
-      "model": "opencode-go/qwen3.6-plus",
       "prompt_file": "agents/researcher.md"
     },
     "designer": {
       "mode": "all",
-      "model": "opencode-go/qwen3.6-plus",
       "prompt_file": "agents/designer.md"
     },
     "auditor": {
       "mode": "all",
-      "model": "opencode-go/qwen3.6-plus",
       "prompt_file": "agents/auditor.md"
     },
     "council": {
@@ -88,9 +82,9 @@
       "mode": "subagent",
       "model": "openrouter/qwen/qwen3-235b-a22b-thinking-2507:free",
       "prompt_file": "agents/council-judge.md"
+    },
     "generalist": {
       "mode": "all",
-      "model": "opencode-go/qwen3.6-plus",
       "prompt_file": "agents/generalist.md"
     }
   },
