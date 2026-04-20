@@ -1,10 +1,10 @@
 ---
 name: researcher
-description: Unified deep research skill. Combines deep-research, research-vault, search-first, and @librarian agent. Triggers on "research this", "learn about", "find papers on", "save this research", "compile research", or any unfamiliar concept.
+description: Unified deep research skill. Combines deep-research, research-vault, and search-first. Triggers on "research this", "learn about", "find papers on", "save this research", "compile research", or any unfamiliar concept.
 use_when: >
   The user explicitly says "use researcher", "call researcher", "run researcher",
   "use research agent", "call research agent", "run research agent",
-  "use librarian", "call librarian", "use researcher agent", "call researcher agent",
+  "use researcher agent", "call researcher agent",
   "use knowledge base", "call knowledge base".
   OR the user wants to research unfamiliar concepts, algorithms, APIs, statistical methods,
   or save/compile research findings. Before implementing anything non-routine.
@@ -12,7 +12,7 @@ use_when: >
 
 # RESEARCHER — Unified Deep Research
 
-The single research skill. Replaces deep-research, research-vault, search-first, @librarian.
+The single research skill. Replaces deep-research, research-vault, search-first.
 
 ## Research Triage
 

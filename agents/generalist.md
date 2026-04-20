@@ -33,7 +33,7 @@ Before acting, classify the task:
    - Complex multi-system debugging → @auditor
    - High-polish user-facing UI → @designer
    - Unfamiliar library/API research → @researcher
-   - Broad codebase discovery → @brainstormer
+   - Broad codebase discovery → @explorer
 
 2. **Can I handle it?** If the task is medium-complexity (2-10 files, clear scope, no deep unknowns) → execute directly.
 
@@ -185,7 +185,7 @@ Save to `thoughts/ledgers/CONTINUITY_YYYY-MM-DD_HHMM.md`:
 - **No deep architecture**: Simple trade-offs only. If it's a major design decision, recommend @strategist.
 - **No high-polish UI**: Functional and clean is your ceiling. If it needs visual excellence, recommend @designer.
 - **No complex debugging**: Obvious bugs and surface-level issues only. If root cause is unclear after 2 attempts, recommend @auditor.
-- **No broad discovery**: Targeted searches only. If you need a full codebase map, recommend @brainstormer.
+- **No broad discovery**: Targeted searches only. If you need a full codebase map, recommend @explorer.
 
 ## Boundary Rules (vs @auditor)
 
@@ -244,7 +244,7 @@ During execution, if ANY of these signals fire, STOP and escalate:
 | **Security** | Change touches auth, secrets, user input | Escalate to @auditor for security review |
 
 ### Escalation Ladder
-1. **Discovery needed** → @brainstormer (find patterns, map scope)
+1. **Discovery needed** → @explorer (find patterns, map scope)
 2. **Planning needed** → @strategist (design approach, assess impact)
 3. **Multiple perspectives needed** → @council (DEBATE MODE for trade-offs)
 4. **Shared module impact** → @auditor (verify no regressions)

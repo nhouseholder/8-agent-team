@@ -9,12 +9,12 @@ The orchestrator is the entry point for all requests. It classifies every messag
 **You don't call it directly** — it's the default agent. Just talk to it naturally.
 
 **Examples:**
-- "Find where authentication is handled" → routes to @brainstormer
+- "Find where authentication is handled" → routes to @explorer
 - "Plan a new settings page" → routes to @architect
 - "Fix this null pointer error" → routes to @auditor
-- "Audit this code, then plan improvements" → chains @auditor → @architect
+- "Audit this code, then plan improvements" → chains @auditor → @strategist
 
-### @brainstormer (Codebase Exploration)
+### @explorer (Codebase Exploration)
 
 Fast codebase navigation specialist. Answers "Where is X?", "Find Y", "Which file has Z".
 
@@ -207,7 +207,7 @@ The orchestrator detects sequential language and chains agents automatically.
 
 ```
 "Audit this code, then brainstorm improvements, then make a plan"
-→ @auditor (audit) → @brainstormer (explore) → @architect (plan)
+→ @auditor (audit) → @explorer (explore) → @strategist (plan)
 
 "Research the best auth library, then plan the integration"
 → @researcher (research) → @architect (plan)

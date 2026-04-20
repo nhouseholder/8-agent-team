@@ -11,7 +11,7 @@ After each agent execution, log the following:
 | Field | Type | Description |
 |---|---|---|
 | timestamp | ISO 8601 | When the execution occurred |
-| agent | string | Agent name (e.g., "orchestrator", "brainstormer") |
+| agent | string | Agent name (e.g., "orchestrator", "explorer") |
 | task_type | string | Category (explore, plan, research, implement, debug, etc.) |
 | status | enum | success, failure, escalated, timeout |
 | duration_ms | number | Execution time in milliseconds |
@@ -60,7 +60,7 @@ One JSON object per line, append-only.
 ```json
 {
   "timestamp": "2026-04-19T10:30:00Z",
-  "agent": "brainstormer",
+  "agent": "explorer",
   "task_type": "explore",
   "status": "success",
   "duration_ms": 3200,

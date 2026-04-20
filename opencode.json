@@ -43,10 +43,10 @@
       "model": "opencode-go/qwen3.6-plus",
       "prompt_file": "agents/orchestrator.md"
     },
-    "brainstormer": {
+    "explorer": {
       "mode": "all",
       "model": "opencode-go/qwen3.6-plus",
-      "prompt_file": "agents/brainstormer.md"
+      "prompt_file": "agents/explorer.md"
     },
     "strategist": {
       "mode": "all",

@@ -7,7 +7,7 @@ A multi-agent coding orchestration system for OpenCode. An **orchestrator** rout
 | Agent | Role | Example Trigger |
 |---|---|---|
 | **orchestrator** | Router & coordinator | Always — entry point for all requests |
-| **brainstormer** | Codebase exploration | "Find where X is used", "Map this codebase" |
+| **explorer** | Codebase exploration | "Find where X is used", "Map this codebase" |
 | **strategist** | Architecture, planning, "what's next" | "How should we build this?", "Plan a feature" |
 | **researcher** | External docs & research | "How does this library work?", "Find best practices" |
 | **designer** | UI/UX implementation | "Build a dashboard", "Improve this component" |
@@ -60,7 +60,7 @@ Specialist executes → verifies → reports back
 ```
 agents/
 ├── orchestrator.md      # Router with decision tree, chain protocol, memory + prompt enhancement
-├── brainstormer.md      # Codebase exploration specialist
+├── explorer.md          # Codebase exploration specialist
 ├── strategist.md        # Architecture, planning, spec-writing (8 modes)
 ├── researcher.md        # External research with source hierarchy
 ├── designer.md          # UI/UX with intentional minimalism
@@ -79,7 +79,7 @@ The system detects sequential language and chains agents automatically:
 
 ```
 "Audit this code, then brainstorm improvements, then make a plan"
-→ @auditor (audit) → @brainstormer (explore) → @strategist (plan)
+→ @auditor (audit) → @explorer (explore) → @strategist (plan)
 ```
 
 Max chain depth: 4. Recovery: retry → escalate → pause for user input.
