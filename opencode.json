@@ -64,7 +64,6 @@
     },
     "council": {
       "mode": "subagent",
-      "model": "openrouter/openai/gpt-oss-120b:free",
       "prompt_file": "agents/council.md",
       "note": "Protocol reference only. Orchestrator fans out to 3 councillor agents below."
     },
