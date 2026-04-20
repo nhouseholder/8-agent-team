@@ -1,7 +1,7 @@
 # Handoff — Agent System Consolidation (12 → 8 Agents)
 
 **Date:** 2026-04-20
-**Version:** 1.5.0
+**Version:** 1.6.0
 **Status:** Production-ready, all changes committed and pushed
 
 ## What Was Done
@@ -23,6 +23,17 @@
 ### Refiner Removal (v1.4)
 - Removed refiner agent (9→8) — capabilities covered by opportunistic-improvement skill + compactor + memory systems
 - Deleted `agents/refiner.md`
+
+### Refiner → Auditor REFINE MODE (v1.6)
+- Merged refiner agent into auditor as REFINE MODE (9→8 agents)
+- Auditor now has 3 modes: READ (audit/review), FIX (implement), REFINE (improve)
+- Deleted `agents/refiner.md`
+
+### Mandatory Memory Checkpoint Protocol (v1.6)
+- C1 Pre-Compaction: save to engram + ledger before any compaction
+- C2 Post-Delegation: save specialist's key finding after notable results
+- C3 Session-End: full summary via engram + brain-router
+- Risk-anchored saves (~300-500 tokens/session total overhead)
 
 ### Generalist Retool (v1.5)
 - Rewrote generalist from Swiss Army knife (305 lines, 11 capabilities) to focused plan executor (~180 lines)
@@ -66,8 +77,9 @@
 4. **Two-phase compaction** — extract to MCP memory first, then summarize
 5. **Parenthetical aliases cause ProviderModelNotFoundError** — only bare @agent names
 6. **opencode.json is source of truth** — always verify after rebase
-7. **Refiner removed** — capabilities covered by opportunistic-improvement skill + compactor + memory systems
+7. **Refiner merged into auditor** — REFINE MODE with risk tiers (🟢/🟡/🔴), 3-fix limit
 8. **Generalist retooled as plan executor** — moved compaction/deploy to skills, orchestrator invokes directly
+9. **Memory checkpoint protocol (C1/C2/C3)** — risk-anchored saves, not time-anchored
 
 ## Repos
 
@@ -86,9 +98,5 @@
 ## Commits This Session
 
 ## Next Steps
-1. Verify all 8 agents pass validation after rebase
+1. All docs updated to reflect 8-agent system
 2. Sync latest skills to superpowers repo
-3. Update docs/AGENT-REFERENCE.md with generalist v1.5 changes
-
-## Known Gaps
-- `docs/AGENT-REFERENCE.md` may still reference old generalist capabilities (305-line Swiss Army knife)

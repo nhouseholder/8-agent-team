@@ -100,7 +100,7 @@
 - Lint/test/build failures
 
 **Fix:**
-1. Check the specific gate that failed in shipper output
+1. Check the specific gate that failed in deploy skill output
 2. For dirty tree: commit or stash changes first
 3. For version regression: manually bump version in package.json
 4. For build failures: fix the underlying issue, then retry ship

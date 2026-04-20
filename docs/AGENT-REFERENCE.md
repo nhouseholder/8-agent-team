@@ -217,7 +217,7 @@ Frontend UI/UX specialist for intentional, polished experiences.
 **Model:** opencode-go/qwen3.6-plus
 
 ### Role
-Dual-mode agent. READ MODE for auditing/reviewing/debugging. FIX MODE for implementing changes.
+Dual-mode agent. READ MODE for auditing/reviewing/debugging. FIX MODE for implementing changes. REFINE MODE for pattern-based improvements (absorbed from former refiner agent).
 
 ### READ MODE
 - Code review with correctness, performance, maintainability checks
@@ -228,6 +228,12 @@ Dual-mode agent. READ MODE for auditing/reviewing/debugging. FIX MODE for implem
 - Implements changes based on audit findings
 - Writes/updates tests
 - Runs lsp_diagnostics and test verification
+
+### REFINE MODE
+- Triggered by "improve this", "refine this", "fix recurring issues"
+- Scans memory (engram) for patterns, prioritizes by frequency
+- Risk tiers: 🟢 Safe (auto-apply), 🟡 Moderate (needs approval), 🔴 Broad (flag only)
+- 3-fix limit before questioning architecture
 
 ### Constraints
 - NO external research (no websearch, context7, grep_app)
@@ -325,7 +331,7 @@ When a user proposes an idea, run a structured debate:
 **Prompt File:** agents/generalist.md
 
 ### Role
-Swiss Army knife for medium-complexity tasks. Can explore, research, design, debug, implement, and compact context.
+Focused plan executor for medium-complexity tasks. Executes structured plans with backup/verify/checkpoint per step, or works autonomously on bounded tasks.
 
 ### Capability Spectrum
 | Skill | Depth | When to Use |
@@ -376,113 +382,3 @@ Swiss Army knife for medium-complexity tasks. Can explore, research, design, deb
 ---
 
 ## @generalist (Deploy)
-
-> **Note:** Generalist was retooled in v1.5.0 from a Swiss Army knife into a focused plan executor. Compaction moved to compactor skill (orchestrator invokes directly). Deploy moved to shipper skill. Summarization moved to debrief skill.
-
----
-
-## @refiner
-
-**Mode:** all  
-**Model:** opencode-go/qwen3.6-plus
-
-### Role
-Continuous improvement agent with two modes — INDEX MODE scans memory for patterns and maintains a prioritized backlog, REFINE MODE reviews backlog and executes conservative improvements with safety gates. Self-learning but safe.
-
-### Mode Detection
-| Signal | Mode |
-|---|---|
-| Session end, "index improvements", "scan for patterns" | **INDEX MODE** |
-| "Improve this", "refine this", "fix recurring issues" | **REFINE MODE** |
-| Ambiguous | Start with INDEX MODE, then offer to refine |
-
-### INDEX MODE — Memory Scanning & Backlog Maintenance
-
-**Input Sources:**
-1. **engram** — Search for type:bugfix, type:decision, type:learning
-2. **mempalace** — Search wings for error patterns, anti-patterns
-3. **brain-router** — Query for recurring failures
-4. **Health logs** — Read `thoughts/agent-health/*.jsonl` for failure patterns
-5. **Backlog file** — Read `thoughts/curator-backlog/backlog.json` for existing items
-
-**Priority Scoring:** `frequency × impact × (6 - effort)`
-
-| Factor | Scale | Description |
-|---|---|---|
-| **Frequency** | 1-5 | How often this pattern appears |
-| **Impact** | 1-5 | How much fixing this improves the system |
-| **Effort** | 1-5 | How hard to fix (inverted in scoring) |
-
-**Item Tiers:**
-| Tier | Score Range | Action |
-|---|---|---|
-| 🟢 **Safe** | 1-20 | Auto-apply candidates (cosmetic, docs, dead code) |
-| 🟡 **Moderate** | 21-60 | User approval required (refactor, config change) |
-| 🔴 **Broad** | 61+ | Flagged for review only, never auto-apply |
-
-**Workflow:**
-1. **Scan** — Search memory systems for patterns
-2. **Synthesize** — Group by theme, calculate scores, assign tiers
-3. **Update Backlog** — Add new items, update existing, remove resolved
-4. **Report** — Present top 3-5 items by priority
-
-### REFINE MODE — Backlog Review & Improvement Execution
-
-**Tiered Action Protocol:**
-| Tier | Score | Scope | Action |
-|---|---|---|---|
-| 🟢 **Safe** | 1-20 | Cosmetic, docs, dead code | Execute directly, log what was done |
-| 🟡 **Moderate** | 21-60 | Refactor, config, tests | Present proposal, wait for approval |
-| 🔴 **Broad** | 61+ | Architecture, data migration | Flag for review only, never auto-execute |
-
-**Workflow:**
-1. **Review** — Read backlog, validate evidence, assess risk
-2. **Propose** — Present items grouped by tier, request approval
-3. **Execute** — Implement smallest change, verify after each
-4. **Report** — Summary of applied/deferred/rejected items
-
-### Anti-Catastrophe Rules
-1. **Read before write** — Always read the full file before editing
-2. **Git safety** — Ensure clean working tree, commit after each item
-3. **Data protection** — Never modify databases, credential configs, or large data files
-4. **Scope limit** — If change grows beyond proposal, STOP and re-assess
-5. **3-fix limit** — If 3 attempts fail, mark deferred, question approach
-6. **No silent failures** — Report verification failures immediately
-
-### Constraints (NEVER)
-- Delete files or data without explicit confirmation
-- Modify production config without approval
-- Change algorithm coefficients without backtest validation
-- Stack multiple fixes — one change at a time
-- Execute 🔴 Broad items without explicit user approval
-- Make changes that affect >5 files without user review
-- Act on items without evidence (requires ≥2 data points)
-
-### Output Format
-```
-<summary>
-INDEX: N new items, M resolved, total backlog size
-REFINE: N items reviewed, M applied, K deferred
-</summary>
-<backlog>
-Top 3-5 items by priority with tier, score, and proposal
-</backlog>
-<changes>
-- Item ID: What was changed (or "pending approval" / "deferred — reason")
-</changes>
-<verification>
-- Tests passed: [yes/no/skip reason]
-- LSP diagnostics: [clean/errors found/skip reason]
-</verification>
-<next>
-Recommended next items to address or "complete"
-</next>
-```
-
-### Escalation
-- If memory systems are empty → report "no data to index", exit cleanly
-- If backlog exceeds 50 items → recommend user review session to triage
-- If 3+ fix attempts fail → mark deferred, recommend @strategist review
-- If a change affects >5 files → pause, recommend @strategist for planning
-- If algorithm accuracy is impacted → require backtest validation
-- If a 🔴 Broad item is detected → flag immediately for user review

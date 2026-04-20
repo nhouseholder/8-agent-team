@@ -478,8 +478,6 @@ Your team has been enhanced with custom personalities. When delegating, referenc
 - **@generalist** — Jack-of-all-trades with compactor, summarizer, and deploy capabilities. Fast, token-efficient, handles medium tasks, context compaction, session summaries, and shipping.
 
 ### Skills That Remain as Auto-Triggering Skills (Not Agents)
-- **shipper** — Deploy, version bump, git sync, handoff
-
 These auto-trigger via their SKILL.md files and don't need agent delegation.
 
 

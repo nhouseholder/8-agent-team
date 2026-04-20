@@ -13,11 +13,10 @@ The 8-agent orchestration system implements a **router-dispatcher** pattern with
 ┌─────────────────────────────────────────────────────────┐
 │                   Orchestrator                           │
 │  ┌──────────────────────────────────────────────────┐   │
-│  │  19-Step Decision Tree                           │   │
-│  │  1. Chain detection                              │   │
-│  │  2-6. Generalist routing                         │   │
-│  │  7-12. Specialist routing                        │   │
-│  │  13-19. Edge case routing                        │   │
+│  │  22-Step Decision Tree                           │   │
+│  │  -1. Memory Retrieval                            │   │
+│  │   0. Prompt Enhancement                          │   │
+│  │  1-22. Routing to specialists                    │   │
 │  └──────────────────────────────────────────────────┘   │
 │  ┌──────────────────────────────────────────────────┐   │
 │  │  Chain Protocol                                  │   │
@@ -30,16 +29,13 @@ The 8-agent orchestration system implements a **router-dispatcher** pattern with
 └────────┬────────┬────────┬────────┬────────┬────────────┘
          │        │        │        │        │
     ┌────▼───┐ ┌──▼────┐ ┌─▼────┐ ┌─▼────┐ ┌▼──────┐
-    │Brain-  │ │Archi- │ │Res-  │ │Design│ │Auditor│
-    │stormer │ │tect   │ │earcher│ │er    │ │       │
+    │Explorer│ │Strate-│ │Res-  │ │Design│ │Auditor│
+    │        │ │gist   │ │earcher│ │er    │ │       │
     └────────┘ └───────┘ └──────┘ └──────┘ └───────┘
-    ┌────────┐ ┌────────┐ ┌────────┐ ┌────────┐
-    │Council │ │General │ │Strateg │ │Shipper │
-    │        │ │ist     │ │ist     │ │        │
-    └────────┘ └────────┘ └────────┘ └────────┘
-    ┌────────┐
-    │Debrief │
-    └────────┘
+    ┌────────┐ ┌────────┐
+    │Council │ │General │
+    │        │ │ist     │
+    └────────┘ └────────┘
          │
          ▼
 ┌─────────────────────────────────────────────────────────┐
@@ -55,25 +51,22 @@ The 8-agent orchestration system implements a **router-dispatcher** pattern with
 ## Agent Roles
 
 ### Routing Layer
-- **orchestrator**: Entry point, decision tree, chain protocol, error handling
+- **orchestrator**: Entry point, decision tree, chain protocol, error handling, memory checkpoints
 
 ### Discovery Layer
-- **brainstormer**: Codebase exploration, pattern discovery, file mapping
+- **explorer**: Codebase exploration, pattern discovery, file mapping, parallel search
 
 ### Knowledge Layer
-- **architect**: Planning, strategy, code review, architectural decisions
+- **strategist**: Architecture, planning, spec-writing, "what's next" (8 modes: SKIP, LITE, FULL, SPRINT, ASSESSMENT, BRIEFING, PREDICTIVE, OPPORTUNISTIC)
 - **researcher**: External documentation, library research, best practices
 
 ### Implementation Layer
 - **designer**: UI/UX implementation, visual polish, responsive design
-- **auditor**: Debugging (READ MODE), implementation (FIX MODE), test writing
-- **generalist**: Medium tasks, config changes, docs, context compaction
+- **auditor**: Debugging (READ MODE), implementation (FIX MODE), conservative improvements (REFINE MODE)
+- **generalist**: Plan executor, medium tasks, config changes, docs
 
 ### Meta Layer
-- **council**: Multi-LLM consensus for high-stakes decisions
-- **strategist**: Strategic recommendations, project assessment
-- **shipper**: Deploy, version bump, release, handoff
-- **debrief**: Summaries, progress tracking, code simplification
+- **council**: Multi-LLM consensus for high-stakes decisions (3-model fan-out via OpenRouter)
 
 ## Data Flow
 
@@ -94,19 +87,17 @@ User → Orchestrator (detect chain)
 ### Memory Flow
 ```
 Session Start → Load context (engram + brain-router)
-During Session → Save observations (engram + brain-router + mempalace)
-Session End → Update ledger, save final state
+During Session → Save observations (C1 pre-compaction, C2 post-delegation)
+Session End → C3 full summary (engram + brain-router)
 ```
 
 ## Decision Tree
 
-The orchestrator uses a 19-step decision tree:
+The orchestrator uses a 22-step decision tree:
 
-1. Multi-agent chain detection
-2-6. Generalist routing (context, speed, medium tasks, docs, scripts)
-7-12. Specialist routing (brainstormer, architect, researcher, designer, auditor, council)
-13. Trivial tasks (do it yourself)
-14-19. Edge cases (tests, refactoring, new projects, migrations, API docs, profiling)
+- **Step -1**: Memory Retrieval Protocol (engram + brain-router + mempalace)
+- **Step 0**: Prompt Enhancement (clarify vague prompts)
+- **Steps 1-22**: Route to the right specialist (chains, context, speed, medium tasks, docs, scripts, exploration, planning, research, UI/UX, auditing, council, trivial, tests, refactoring, new projects, migrations, API docs, profiling, improvements)
 
 ## Chain Protocol
 
@@ -135,52 +126,18 @@ The orchestrator uses a 19-step decision tree:
 - **Key operations**: search, save, timeline, context
 
 ### Mempalace
-- **Purpose**: Semantic storage with hierarchical organization
+- **Purpose**: Semantic storage with hierarchical organization (READ-ONLY)
 - **Structure**: Wings → Rooms → Drawers
-- **Key operations**: search, add_drawer, traverse, knowledge graph
+- **Key operations**: search, traverse, knowledge graph
 
 ### Brain-Router
 - **Purpose**: Unified routing between structured facts and conversation history
 - **Key operations**: query, save, context, correct, forget
 
-## Configuration
-
-### File Structure
-```
-opencode/
-├── opencode.json              # Main configuration
-├── agents/
-│   ├── generalist.md          # File-based prompt
-│   └── _shared/
-│       └── memory-systems.md  # Shared memory block
-├── docs/
-│   ├── README.md
-│   ├── USAGE.md
-│   ├── CHAIN-EXAMPLES.md
-│   ├── TROUBLESHOOTING.md
-│   ├── ARCHITECTURE.md
-│   └── AGENT-REFERENCE.md
-├── scripts/
-│   └── validate-agents.js     # Validation script
-├── examples/
-│   ├── minimal.json
-│   ├── standard.json
-│   ├── with-memory.json
-│   └── enterprise.json
-└── CHANGELOG.md
-```
-
-### Model Configuration
-```json
-{
-  "models": {
-    "default": "opencode-go/qwen3.6-plus",
-    "fast": "opencode-go/qwen3.6-plus",
-    "smart": "opencode-go/qwen3.6-plus",
-    "creative": "opencode-go/qwen3.6-plus"
-  }
-}
-```
+### Mandatory Checkpoint Protocol (C1/C2/C3)
+- **C1 Pre-Compaction**: Save task state to engram + ledger before any compaction
+- **C2 Post-Delegation**: Save specialist's key finding after notable results
+- **C3 Session-End**: Full summary via engram + brain-router
 
 ## Error Handling
 

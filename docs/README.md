@@ -21,10 +21,10 @@ Detailed documentation for the agent orchestration system.
 | **strategist** | Unified advisor — architecture, planning, spec-writing, "what's next" (8 modes) |
 | **researcher** | External research with source hierarchy (Tier 1-3) |
 | **designer** | UI/UX with intentional minimalism philosophy |
-| **auditor** | Dual-mode (READ/FIX) with verification gates |
+| **auditor** | Debug, review, improve, fix (READ/FIX/REFINE modes) |
 | **council** | Multi-LLM consensus + DEBATE MODE for structured idea evaluation |
 | **generalist** | Plan executor, medium tasks, file safety (backup/verify/revert) |
 
 ## Version
 
-1.5.0 — Retooled generalist as plan executor, compaction/deploy moved to skills
+1.6.0 — Merged refiner→auditor (REFINE MODE), mandatory C1/C2/C3 memory checkpoints, 9→8 agents

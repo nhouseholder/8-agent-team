@@ -73,11 +73,6 @@
       "mode": "all",
       "model": "opencode-go/qwen3.6-plus",
       "prompt_file": "agents/generalist.md"
-    },
-    "refiner": {
-      "mode": "all",
-      "model": "opencode-go/qwen3.6-plus",
-      "prompt_file": "agents/refiner.md"
     }
   },
   "permission": {

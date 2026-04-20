@@ -2,6 +2,60 @@
 
 All notable changes to the Agent Orchestration System.
 
+## [1.6.0] - 2026-04-20
+
+### Merged: 9 → 8 Agents
+
+- **refiner → @auditor**: REFINE MODE added to auditor. Scans memory for patterns, prioritizes by frequency, proposes improvements with risk tiers (🟢/🟡/🔴). Deleted `agents/refiner.md`.
+
+### Added
+- **Mandatory Memory Checkpoint Protocol (C1/C2/C3)**: Risk-anchored saves instead of vague "after significant work". C1 Pre-Compaction, C2 Post-Delegation, C3 Session-End.
+
+### Updated
+- `agents/orchestrator.md`: Updated team list (8 agents), delegation table, routing step 20 → @auditor REFINE MODE
+- `agents/auditor.md`: Added REFINE MODE section with Refine Protocol
+- `agents/generalist.md`: Fixed output format (added `<next>` tags)
+- `README.md`: Updated to 8 agents, version 1.6.0
+- `docs/ARCHITECTURE.md`: Updated diagram, agent roles, decision tree (22 steps), memory checkpoint protocol
+- `docs/AGENT-REFERENCE.md`: Removed @refiner section, updated @auditor (3 modes), updated @generalist
+- `docs/TROUBLESHOOTING.md`: Fixed shipper reference → deploy skill
+- `examples/*.json`: Removed refiner entries, updated comments to 8-agent
+- `CHANGELOG.md`: This file
+
+### Agents (8 total)
+- **orchestrator**: Router with 22-step decision tree, chain protocol, memory checkpoints
+- **explorer**: Codebase exploration with parallel search protocol
+- **strategist**: Architecture, planning, spec-writing, "what's next" (8 modes)
+- **researcher**: External research with source hierarchy (Tier 1-3)
+- **designer**: UI/UX with intentional minimalism philosophy
+- **auditor**: Debug, review, improve, fix (READ/FIX/REFINE modes)
+- **council**: Multi-LLM consensus via 3-model fan-out (OpenRouter)
+- **generalist**: Plan executor, medium tasks, compaction, deploy
+
+## [1.5.0] - 2026-04-20
+
+### Retooled
+- **@generalist**: Rewritten from Swiss Army knife (305 lines) to focused plan executor (~180 lines). PLAN MODE and AUTONOMOUS MODE with backup/verify/checkpoint per step.
+- Moved compaction/deploy/summarization to standalone skills (orchestrator invokes directly)
+
+### Added
+- **Revert Protocol**: Structured rollback on plan step failure
+- **Error Detection & Escalation**: Table-based escalation for generalist failures
+- **Two-Phase Compaction Protocol**: Extract to MCP memory first, then summarize
+
+## [1.4.0] - 2026-04-20
+
+### Merged: 10 → 9 Agents
+- **shipper → @generalist**: Deploy capabilities absorbed. Shipper was causing broken routing (not registered in opencode.json). Deploy moved to shipper skill.
+- Deleted `agents/shipper.md`
+
+## [1.3.0] - 2026-04-20
+
+### Changed
+- **brainstormer → @explorer**: Renamed for clarity. Deleted `agents/brainstormer.md`, created `agents/explorer.md`.
+- Codified mempalace as READ-ONLY — engram + brain-router for all writes
+- Replaced advisory anti-loop guards with structural circuit breakers
+
 ## [1.2.0] - 2026-04-19
 
 ### Consolidated: 12 → 10 Agents
