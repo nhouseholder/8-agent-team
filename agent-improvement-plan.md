@@ -76,9 +76,9 @@
 | Task | Current Gap | Fix |
 |---|---|---|
 | "Write tests for existing code" | @auditor or @generalist? | → @auditor (test writing is QA) |
-| "Refactor this entire module" | @generalist or @architect? | → @architect (plan) → @generalist (implement) |
-| "Set up new project from scratch" | Nobody owns this | → @architect (SPRINT mode) |
-| "Migrate framework X to Y" | Complex, multi-agent | → Chain: @researcher → @architect → @auditor |
+| "Refactor this entire module" | @generalist or @strategist? | → @strategist (plan) → @generalist (implement) |
+| "Set up new project from scratch" | Nobody owns this | → @strategist (SPRINT mode) |
+| "Migrate framework X to Y" | Complex, multi-agent | → Chain: @researcher → @strategist → @auditor |
 | "Write API documentation" | Not explicit | → @generalist |
 | "Performance profiling" | Not explicit | → @auditor (review) → @generalist (implement fixes) |
 
@@ -154,14 +154,14 @@ mode: primary
 
 **Files to create:**
 - `agents/orchestrator.md`
-- `agents/brainstormer.md`
+- `agents/explorer.md`
 - `agents/architect.md`
 - `agents/researcher.md`
 - `agents/designer.md`
 - `agents/auditor.md`
 - `agents/council.md`
 - `agents/strategist.md`
-- `agents/shipper.md`
+- `agents/generalist.md`
 - `agents/debrief.md`
 
 **Config change:** Update `opencode.json` to use `prompt_file` for all agents.
@@ -184,11 +184,11 @@ mode: primary
 - If an agent takes too long: interrupt, save partial results, report status
 
 ### Fallback Chain
-- @architect unavailable → @generalist (light planning)
+- @strategist unavailable → @generalist (light planning)
 - @researcher unavailable → @generalist (light research)
 - @designer unavailable → @generalist (functional UI)
 - @auditor unavailable → @generalist (basic debugging)
-- @brainstormer unavailable → orchestrator does targeted search
+- @explorer unavailable → orchestrator does targeted search
 ```
 
 ### 2.4 Remove Hardcoded Paths

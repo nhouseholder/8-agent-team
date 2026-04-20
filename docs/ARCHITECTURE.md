@@ -198,8 +198,8 @@ opencode/
 - Report status to user
 
 ### Fallback Chain
-- @architect unavailable → @generalist (light planning)
+- @strategist unavailable → @generalist (light planning)
 - @researcher unavailable → @generalist (light research)
 - @designer unavailable → @generalist (functional UI)
 - @auditor unavailable → @generalist (basic debugging)
-- @brainstormer unavailable → orchestrator does targeted search
+- @explorer unavailable → orchestrator does targeted search

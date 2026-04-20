@@ -1,6 +1,6 @@
 {
   "$schema": "https://opencode.ai/config.json",
-  "_comment": "Minimal config — orchestrator + generalist only. Basic coding assistance with no specialist agents.",
+  "_comment": "Minimal config \u2014 orchestrator + generalist only. Basic coding assistance with no specialist agents.",
   "version": "1.0.0",
   "model": "opencode-go/qwen3.6-plus",
   "agent": {

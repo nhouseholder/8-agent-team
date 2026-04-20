@@ -10,7 +10,7 @@ The orchestrator is the entry point for all requests. It classifies every messag
 
 **Examples:**
 - "Find where authentication is handled" → routes to @explorer
-- "Plan a new settings page" → routes to @architect
+- "Plan a new settings page" → routes to @strategist
 - "Fix this null pointer error" → routes to @auditor
 - "Audit this code, then plan improvements" → chains @auditor → @strategist
 
@@ -30,7 +30,7 @@ Fast codebase navigation specialist. Answers "Where is X?", "Find Y", "Which fil
 
 **Output:** Structured map with file paths, line numbers, and brief descriptions.
 
-### @architect (Planning & Strategy)
+### @strategist (Planning & Strategy)
 
 Strategic technical advisor for architecture decisions, code review, and engineering guidance.
 
@@ -112,7 +112,7 @@ Runs consensus across multiple models for high-stakes decisions.
 - Need diverse perspectives on ambiguous problems
 
 **When NOT to use:**
-- Routine decisions (use @architect LITE)
+- Routine decisions (use @strategist LITE)
 - Simple implementation tasks
 - When speed matters more than confidence
 
@@ -156,28 +156,13 @@ Recommends highest-impact next actions scoped to the current project.
 
 **Output:** Prioritized recommendations with evidence from git state, handoffs, and memory.
 
-### @shipper (Deploy & Release)
+### @generalist (Deploy)
 
-Sync, bump, commit, push, deploy, verify, and handoff.
+> **Note:** Shipper was merged into @generalist in v1.3.0.
 
-**Full ship sequence:**
-1. Detect project state
-2. Pre-flight gates (clean tree, version check, lint/test/build)
-3. Version bump (PATCH/MINOR/MAJOR)
-4. Commit + push
-5. Deploy (Cloudflare Pages/Workers)
-6. Verify live site
-7. Tag release
-8. Create handoff
+Sync, bump, commit, push, deploy, verify, and handoff. See @generalist section above.
 
-**Example prompts:**
-- "Ship this"
-- "Deploy to production"
-- "Bump version and push"
-
-**Output:** Ship result with step statuses, verification, and handoff location.
-
-### @debrief (Summaries)
+### @generalist (Summaries)
 
 Produces concise, factual summaries of work done.
 
@@ -210,7 +195,7 @@ The orchestrator detects sequential language and chains agents automatically.
 → @auditor (audit) → @explorer (explore) → @strategist (plan)
 
 "Research the best auth library, then plan the integration"
-→ @researcher (research) → @architect (plan)
+→ @researcher (research) → @strategist (plan)
 
 "Build the UI, then write tests for it"
 → @designer (build) → @auditor (test)

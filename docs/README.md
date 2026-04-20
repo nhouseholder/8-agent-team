@@ -1,4 +1,4 @@
-# 10-Agent Orchestration System — Documentation
+# 9-Agent Orchestration System — Documentation
 
 Detailed documentation for the agent orchestration system.
 
@@ -12,21 +12,20 @@ Detailed documentation for the agent orchestration system.
 | [USAGE.md](USAGE.md) | How to use the system, configuration, best practices |
 | [TROUBLESHOOTING.md](TROUBLESHOOTING.md) | Common issues and solutions |
 
-## Current Agent Roster (10 total)
+## Current Agent Roster (9 total)
 
 | Agent | Role |
 |---|---|
 | **orchestrator** | Router with 22-step decision tree, memory retrieval, prompt enhancement, chain protocol |
-| **brainstormer** | Codebase exploration with parallel search protocol |
+| **explorer** | Codebase exploration with parallel search protocol |
 | **strategist** | Unified advisor — architecture, planning, spec-writing, "what's next" (8 modes) |
 | **researcher** | External research with source hierarchy (Tier 1-3) |
 | **designer** | UI/UX with intentional minimalism philosophy |
 | **auditor** | Dual-mode (READ/FIX) with verification gates |
 | **council** | Multi-LLM consensus + DEBATE MODE for structured idea evaluation |
-| **shipper** | Deploy pipeline with pre-flight gates and rollback |
-| **generalist** | Medium tasks, context compaction, session summarization |
+| **generalist** | Medium tasks, compaction, summarization, deploy, handoff |
 | **refiner** | Continuous improvement with INDEX MODE and REFINE MODE |
 
 ## Version
 
-1.2.0 — Consolidated 12→10 agents, added prompt enhancement, memory retrieval, council DEBATE MODE
+1.3.0 — Merged shipper→generalist, structural anti-loop guards, mempalace read-only, 10→9 agents

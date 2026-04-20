@@ -19,7 +19,7 @@
 | `agents/strategist.md` | Merged architect+strategist (8 modes, spec/plan workflow) |
 | `agents/generalist.md` | Added Summarization Protocol |
 | `agents/refiner.md` | Merged curator+refiner (INDEX/REFINE modes) |
-| `docs/AGENT-REFERENCE.md` | Rewrote @strategist section, removed @debrief/@architect, updated all cross-refs |
+| `docs/AGENT-REFERENCE.md` | Rewrote @strategist section, removed @generalist/@strategist, updated all cross-refs |
 | `CHANGELOG.md` | Added v1.2.0 entry with merge details |
 | `examples/standard.json` | 10-agent roster, v1.2.0 |
 | `examples/with-memory.json` | 10-agent roster, v1.2.0 |
@@ -30,7 +30,7 @@ Fixed all 10 agent files to pass `scripts/validate-agents.js`:
 - Added `## Role`, `## Constraints`, `## Output Format`, `## Escalation Protocol` section headers
 - Added `description` to frontmatter where missing
 - Replaced inline ~200-line memory blocks with `agents/_shared/memory-systems.md` reference
-- Updated all `@architect` references to `@strategist`
+- Updated all `@strategist` references to `@strategist`
 
 ## Current 10-Agent Roster
 | Agent | Role |
@@ -57,11 +57,11 @@ Decision Tree Coverage: 11/11 task types
 ## Next Steps
 1. **Add GitHub remote** — `git remote add origin <repo-url>` then `git push -u origin main`
 2. **Delete removed agent files** — `agents/architect.md`, `agents/debrief.md`, `agents/curator.md` (if still present)
-3. **Update README.md** — Architecture diagram still shows 11 agents including @debrief and @architect
+3. **Update README.md** — Architecture diagram still shows 11 agents including @generalist and @strategist
 4. **Consider**: The `docs/README.md` still references "8-Agent" and "11-agent" in various places — needs consistency pass to "10-Agent"
 
 ## Known Gaps
-- `docs/README.md` architecture diagram and agent table still list @architect and @debrief
+- `docs/README.md` architecture diagram and agent table still list @strategist and @generalist
 - `docs/README.md` header says "8-Agent" — should be "10-Agent"
-- `docs/README.md` chain example still references @architect
+- `docs/README.md` chain example still references @strategist
 - Removed agent prompt files (`architect.md`, `debrief.md`, `curator.md`) may still exist on disk

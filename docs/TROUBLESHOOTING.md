@@ -53,7 +53,7 @@
 
 ### Agent Gives Wrong Type of Response
 
-**Symptom:** @architect starts coding, @auditor starts researching, etc.
+**Symptom:** @strategist starts coding, @auditor starts researching, etc.
 
 **Causes:**
 - Prompt contradiction (says READ-ONLY but also says execute)
@@ -90,9 +90,9 @@
 2. Specify a preset if available: `council_session(prompt="...", preset="technical")`
 3. Only use council for genuinely high-stakes decisions
 
-### Shipper Deploy Fails
+### Deploy Fails
 
-**Symptom:** @shipper aborts during pre-flight gates.
+**Symptom:** @generalist aborts during deploy pre-flight gates.
 
 **Causes:**
 - Dirty working tree (uncommitted changes)
@@ -116,7 +116,7 @@
 **Fix:**
 1. Remind generalist: "Be concise, read only what you need"
 2. If task needs deep research → route to @researcher
-3. If task needs deep architecture → route to @architect
+3. If task needs deep architecture → route to @strategist
 
 ### Decision Tree Routes to Wrong Agent
 

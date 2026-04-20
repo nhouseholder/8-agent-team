@@ -8,7 +8,9 @@
   "mcp": {
     "brain-router": {
       "type": "local",
-      "command": ["brain-router"],
+      "command": [
+        "brain-router"
+      ],
       "environment": {
         "BRAIN_PROJECT": "global",
         "ENGRAM_DB": "{env:HOME}/.engram/engram.db",
@@ -18,12 +20,17 @@
     },
     "engram": {
       "type": "local",
-      "command": ["engram", "mcp"],
+      "command": [
+        "engram",
+        "mcp"
+      ],
       "enabled": true
     },
     "mempalace": {
       "type": "local",
-      "command": ["mempalace-mcp"],
+      "command": [
+        "mempalace-mcp"
+      ],
       "environment": {
         "MEMPALACE_PALACE": "{env:HOME}/.mempalace/global"
       },
@@ -35,11 +42,6 @@
       "mode": "primary",
       "model": "opencode-go/qwen3.6-plus",
       "prompt_file": "agents/orchestrator.md"
-    },
-    "brainstormer": {
-      "mode": "all",
-      "model": "opencode-go/qwen3.6-plus",
-      "prompt_file": "agents/brainstormer.md"
     },
     "strategist": {
       "mode": "all",

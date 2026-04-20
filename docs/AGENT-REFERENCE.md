@@ -19,7 +19,7 @@ AI coding orchestrator that routes tasks to specialists for optimal quality, spe
 4. Medium task (2-10 files, clear scope) → @generalist
 5. Documentation/README/changelog → @generalist
 6. Script/automation/tooling → @generalist
-7. Deep codebase discovery → @brainstormer
+7. Deep codebase discovery → @explorer
 8. Planning/spec/strategy → @strategist
 9. External research/docs → @researcher
 10. UI/UX polish → @designer
@@ -47,7 +47,7 @@ AI coding orchestrator that routes tasks to specialists for optimal quality, spe
 
 ---
 
-## @brainstormer
+## @explorer
 
 **Mode:** all  
 **Model:** opencode-go/qwen3.6-plus
@@ -375,52 +375,11 @@ Swiss Army knife for medium-complexity tasks. Can explore, research, design, deb
 
 ---
 
-## @shipper
+## @generalist (Deploy)
 
-**Mode:** all  
-**Model:** opencode-go/qwen3.6-plus
+> **Note:** Shipper was merged into @generalist in v1.3.0. Deploy tasks are now routed to @generalist.
 
-### Role
-Sync, bump, commit, push, deploy, verify, and handoff.
-
-### Full Ship Sequence
-1. **DETECT PROJECT** — pwd, git remote, branch, version
-2. **PRE-FLIGHT GATES** (MANDATORY):
-   - Clean working tree (abort if dirty)
-   - Version regression check (abort if local < live)
-   - Lint + test + build (abort if any fails)
-3. **VERSION BUMP** — PATCH/MAJOR/MINOR
-4. **COMMIT + PUSH** — structured commit message
-5. **DEPLOY** — Cloudflare Pages/Workers via wrangler
-6. **VERIFY LIVE** — HTTP status, key pages, API endpoints
-7. **TAG RELEASE** — git tag + push tag
-8. **HANDOFF** — create handoff file
-
-### Rules
-- Never deploy without passing tests and lint
-- Never build/deploy from iCloud Drive — clone to /tmp first
-- Always snapshot current deployment before deploying
-- Always verify live site after deployment
-- Always rollback on verification failure
-
-### Output Format
-```
-<summary>Ship result (version, commit, deploy status)</summary>
-<steps>
-- Step 1: Status (done/skipped/failed)
-- Step 2: Status (done/skipped/failed)
-</steps>
-<verification>
-- Live site: [status]
-- Tests: [status]
-</verification>
-<next>Handoff location or "complete"</next>
-```
-
-### Escalation
-- If out of depth after 2 attempts → recommend the right specialist
-- If task requires capabilities you don't have → say so explicitly
-- Never guess or hallucinate — admit uncertainty
+See the @generalist section above for full deploy protocol.
 
 ---
 

@@ -1,6 +1,6 @@
 {
   "$schema": "https://opencode.ai/config.json",
-  "_comment": "Standard config — full 10-agent core system. Recommended default for most users.",
+  "_comment": "Standard config \u2014 full 10-agent core system. Recommended default for most users.",
   "version": "1.2.0",
   "model": "opencode-go/qwen3.6-plus",
   "agent": {
@@ -8,11 +8,6 @@
       "mode": "primary",
       "model": "opencode-go/qwen3.6-plus",
       "prompt_file": "agents/orchestrator.md"
-    },
-    "brainstormer": {
-      "mode": "all",
-      "model": "opencode-go/qwen3.6-plus",
-      "prompt_file": "agents/brainstormer.md"
     },
     "strategist": {
       "mode": "all",
@@ -38,11 +33,6 @@
       "mode": "all",
       "model": "opencode-go/qwen3.6-plus",
       "prompt_file": "agents/council.md"
-    },
-    "shipper": {
-      "mode": "all",
-      "model": "opencode-go/qwen3.6-plus",
-      "prompt_file": "agents/shipper.md"
     },
     "generalist": {
       "mode": "all",

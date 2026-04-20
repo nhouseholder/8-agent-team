@@ -26,7 +26,7 @@ The orchestrator recognizes these patterns:
 ```
 @auditor (READ MODE)
   ↓ audit findings, file references
-@architect (LITE MODE)
+@strategist (LITE MODE)
   ↓ improvement plan with trade-offs
 @auditor (FIX MODE)
   ↓ implemented changes + verification
@@ -42,7 +42,7 @@ The orchestrator recognizes these patterns:
 ```
 @researcher
   ↓ source hierarchy, best practices, examples
-@architect (FULL MODE)
+@strategist (FULL MODE)
   ↓ spec interview, implementation plan
 @generalist
   ↓ multi-file implementation + verification
@@ -56,7 +56,7 @@ The orchestrator recognizes these patterns:
 
 **Chain:**
 ```
-@brainstormer
+@explorer
   ↓ file map, usage patterns, suspect locations
 @auditor (READ MODE)
   ↓ root cause analysis with evidence
@@ -92,7 +92,7 @@ The orchestrator recognizes these patterns:
   ↓ coverage gaps, quality issues
 @auditor (FIX MODE)
   ↓ new tests + verification
-@shipper
+@generalist
   ↓ pre-flight gates → deploy → verify → handoff
 ```
 
@@ -104,11 +104,11 @@ The orchestrator recognizes these patterns:
 
 **Chain:**
 ```
-@brainstormer
+@explorer
   ↓ endpoint map, current rate limiting (if any)
 @researcher
   ↓ rate limiting algorithms, library options, best practices
-@architect (LITE MODE)
+@strategist (LITE MODE)
   ↓ throttling strategy with trade-offs
 ```
 
@@ -125,11 +125,11 @@ If a chain breaks mid-sequence:
 
 **Example recovery:**
 ```
-Chain: @researcher → @architect → @auditor
+Chain: @researcher → @strategist → @auditor
 @researcher completes ✅
-@architect needs clarification on scope → PAUSE
+@strategist needs clarification on scope → PAUSE
 User provides scope → RESUME
-@architect completes ✅
+@strategist completes ✅
 @auditor implements ✅
 ```
 

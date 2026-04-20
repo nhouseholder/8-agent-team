@@ -1,12 +1,14 @@
 {
   "$schema": "https://opencode.ai/config.json",
-  "_comment": "Enterprise config — full 10-agent system + memory + health monitoring + validation. All features enabled.",
+  "_comment": "Enterprise config \u2014 full 10-agent system + memory + health monitoring + validation. All features enabled.",
   "version": "1.2.0",
   "model": "opencode-go/qwen3.6-plus",
   "mcp": {
     "brain-router": {
       "type": "local",
-      "command": ["brain-router"],
+      "command": [
+        "brain-router"
+      ],
       "environment": {
         "BRAIN_PROJECT": "global",
         "ENGRAM_DB": "{env:HOME}/.engram/engram.db",
@@ -16,12 +18,17 @@
     },
     "engram": {
       "type": "local",
-      "command": ["engram", "mcp"],
+      "command": [
+        "engram",
+        "mcp"
+      ],
       "enabled": true
     },
     "mempalace": {
       "type": "local",
-      "command": ["mempalace-mcp"],
+      "command": [
+        "mempalace-mcp"
+      ],
       "environment": {
         "MEMPALACE_PALACE": "{env:HOME}/.mempalace/global"
       },
@@ -33,11 +40,6 @@
       "mode": "primary",
       "model": "opencode-go/qwen3.6-plus",
       "prompt_file": "agents/orchestrator.md"
-    },
-    "brainstormer": {
-      "mode": "all",
-      "model": "opencode-go/qwen3.6-plus",
-      "prompt_file": "agents/brainstormer.md"
     },
     "strategist": {
       "mode": "all",
@@ -64,11 +66,6 @@
       "model": "opencode-go/qwen3.6-plus",
       "prompt_file": "agents/council.md"
     },
-    "shipper": {
-      "mode": "all",
-      "model": "opencode-go/qwen3.6-plus",
-      "prompt_file": "agents/shipper.md"
-    },
     "generalist": {
       "mode": "all",
       "model": "opencode-go/qwen3.6-plus",
@@ -88,11 +85,17 @@
   },
   "hooks": {
     "post_agent": {
-      "command": ["node", "scripts/health-log.js"],
+      "command": [
+        "node",
+        "scripts/health-log.js"
+      ],
       "description": "Log agent execution health after each run"
     },
     "pre_commit": {
-      "command": ["node", "scripts/validate-agents.js"],
+      "command": [
+        "node",
+        "scripts/validate-agents.js"
+      ],
       "description": "Validate all agent prompts before committing changes"
     }
   }
