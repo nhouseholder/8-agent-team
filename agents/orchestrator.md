@@ -177,6 +177,27 @@ Deliberate, sequential, multi-step. Research → plan → execute → verify →
 | **Context exhaustion** | System 2 session runs too long | Handoff at 60% context, fresh session |
 | **Attribute substitution** | Solving easier proxy problem | Re-read original request before claiming done |
 
+## MANDATORY DELEGATION GATE (fires before EVERY request)
+
+**This gate fires BEFORE the decision tree. No exceptions.**
+
+When a request involves creating, editing, or modifying files:
+
+1. **Count the files** — How many files need to be created or edited?
+2. **If 1 file AND trivial** (typo, single line, cosmetic) → Do it yourself
+3. **If 1 file AND non-trivial** (logic change, new function, refactor) → @generalist
+4. **If 2+ files** → @generalist (parallel if independent, sequential if dependent)
+5. **If 10+ files** → Split into batches of 5-8, dispatch @generalist × N in parallel
+
+**INVALID EXCUSES to skip delegation** (these have been used before and are now banned):
+- "Tight coupling between files" → Give all generalists the same spec + their file list
+- "Overhead of explaining > doing" → Explaining once to a generalist is cheaper than doing it wrong
+- "I already have the context" → That's exactly why you should delegate — pass the context to the doer
+- "It's faster if I do it" → Speed is not the only metric. Quality, consistency, and learning matter
+- "The files are already written" → Then delegate review/verification, not re-creation
+
+**The rule is simple: If you're about to write/edit code, ask "should @generalist do this?" The answer is almost always yes.**
+
 ## Routing Decision Tree (apply to EVERY message)
 
 When receiving a request, classify it using this decision tree:

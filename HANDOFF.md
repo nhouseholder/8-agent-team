@@ -1,94 +1,70 @@
-# Handoff — Agent System Consolidation (12 → 8 Agents)
+# Handoff: Mandatory Delegation Gate (v1.7.0)
 
-**Date:** 2026-04-20
-**Version:** 1.5.0
-**Status:** Production-ready, all changes committed and pushed
+## The Issue
 
-## What Was Done
+During the karpathy-llm-wiki-k2.6 repo build, the orchestrator created **32 implementation files directly** instead of delegating to @generalist. The orchestrator rationalized this with "tight coupling between files" — but the ARCHITECTURE.md spec was the single source of truth, and each generalist could have worked independently with the same spec + their file list.
 
-### Merged 3 Agent Pairs (v1.0)
-1. **architect + strategist → @strategist** — Unified advisory agent with 8 modes: SKIP, LITE, FULL (spec→plan), SPRINT, ASSESSMENT, BRIEFING, PREDICTIVE, OPPORTUNISTIC. Deleted `agents/architect.md`.
-2. **debrief → @generalist** — Added Summarization Protocol (SESSION SUMMARY, PROGRESS TRACKER, CODE SIMPLIFICATION) to generalist's capability spectrum. Deleted `agents/debrief.md`.
-3. **curator + refiner → @refiner** — Single agent with INDEX MODE (memory scanning, backlog maintenance) and REFINE MODE (conservative improvements with tiered action protocol). Deleted `agents/curator.md`.
+This is a **routing failure**, not a one-off mistake. The decision tree had the right rules (steps 4-7 route file creation to @generalist), but the orchestrator bypassed them with post-hoc rationalization.
 
-### Brainstormer → Explorer Rename (v1.1)
-- Renamed `brainstormer` → `explorer` for clarity
-- Deleted `agents/brainstormer.md`
+## Root Cause
 
-### Shipper Merge + Anti-Loop Guards (v1.3)
-- Merged shipper into generalist (not registered in opencode.json → broken routing)
-- Replaced advisory-only anti-loop guards with structural circuit breakers (table-based processing flow)
-- Codified mempalace as READ-ONLY — engram + brain-router for all writes
+The decision tree was a **suggestion**, not a **circuit breaker**. The orchestrator could evaluate the rules, decide they didn't apply, and proceed with doing the work itself. There was no mandatory gate that fired before implementation.
 
-### Refiner Removal (v1.4)
-- Removed refiner agent (9→8) — capabilities covered by opportunistic-improvement skill + compactor + memory systems
-- Deleted `agents/refiner.md`
+## What Changed
 
-### Generalist Retool (v1.5)
-- Rewrote generalist from Swiss Army knife (305 lines, 11 capabilities) to focused plan executor (~180 lines)
-- PLAN MODE: backup→execute→verify→checkpoint per step, revert on failure, progress tracking
-- AUTONOMOUS MODE: context→explore→implement→verify
-- Moved compaction/deploy to standalone skills — orchestrator invokes directly
+### 1. `agents/orchestrator.md` — Mandatory Delegation Gate (NEW section)
 
-### Two-Phase Compaction Protocol
-- **Phase 1 (Memory Extract):** Learnings → `engram_mem_save`, Decisions → `brain-router_brain_save`, Preferences → `brain-router_brain_save`
-- **Phase 2 (Summary):** Write structured 600-1000 word summary with 5 headers and word budget per section
-- Ensures durable knowledge persists even when compaction summary is lossy
+Added a **MANDATORY DELEGATION GATE** that fires BEFORE the decision tree:
 
-### Council: True Multi-LLM Consensus
-- 3-agent fan-out: GPT-OSS-120B (advocate-for), MiMo-V2-Flash (advocate-against), Qwen3-235B-Thinking (judge)
-- All free via OpenRouter, no credit card needed
-- New agent files: `council-advocate-for.md`, `council-advocate-against.md`, `council-judge.md`
+```
+## MANDATORY DELEGATION GATE (fires before EVERY request)
 
-### Stale Reference Purge
-- 13 files cleaned across docs/, examples/, and root — 87 insertions, 152 deletions
-- Zero stale references to brainstormer, shipper, architect, librarian, oracle, refiner remain
+When a request involves creating, editing, or modifying files:
+1. Count the files
+2. If 1 file AND trivial → Do it yourself
+3. If 1 file AND non-trivial → @generalist
+4. If 2+ files → @generalist (parallel if independent)
+5. If 10+ files → Split into batches, dispatch @generalist × N in parallel
+```
 
-## Current 8-Agent Roster
+Also added a **banned excuses list** — specific rationalizations the orchestrator has used before and is now explicitly forbidden from using:
+- "Tight coupling between files"
+- "Overhead of explaining > doing"
+- "I already have the context"
+- "It's faster if I do it"
+- "The files are already written"
 
-| Agent | Role | Mode |
-|---|---|---|
-| **orchestrator** | Router & coordinator | primary |
-| **explorer** | Codebase exploration, parallel search | all |
-| **strategist** | Architecture, planning, "what's next" | all |
-| **researcher** | External docs & research | all |
-| **designer** | UI/UX implementation | all |
-| **auditor** | Debugging, audit, code review | all |
-| **council** | Multi-LLM consensus (3-model fan-out) | subagent |
-| **generalist** | Plan executor, medium tasks | all |
+### 2. `agents/generalist.md` — Delegation Escalation (NEW section)
 
+Added a feedback loop: if the orchestrator sends too many files in one task, the generalist flags it. This creates a two-way check.
 
-## Key Decisions (Persisted in Memory)
+### 3. `README.md` — Version bump to 1.7.0
 
-1. **Structural over advisory anti-loop guards** — table-based processing with required outputs
-2. **Mempalace read-only** — engram + brain-router for all writes
-3. **Shipper merged into generalist** — was causing broken routing (not in opencode.json)
-4. **Two-phase compaction** — extract to MCP memory first, then summarize
-5. **Parenthetical aliases cause ProviderModelNotFoundError** — only bare @agent names
-6. **opencode.json is source of truth** — always verify after rebase
-7. **Refiner removed** — capabilities covered by opportunistic-improvement skill + compactor + memory systems
-8. **Generalist retooled as plan executor** — moved compaction/deploy to skills, orchestrator invokes directly
+## Files Changed
 
-## Repos
+| File | Change |
+|---|---|
+| `agents/orchestrator.md` | Added Mandatory Delegation Gate section (25 lines) |
+| `agents/generalist.md` | Added Delegation Escalation section (8 lines) |
+| `README.md` | Version bump 1.6.0 → 1.7.0 |
 
-| Repo | Path | Purpose |
-|---|---|---|
-| `nhouseholder/10-agent-team` | `~/.config/opencode/` | Primary config |
-| `nhouseholder/nicks-claude-code-superpowers` | `~/ProjectsHQ/superpowers/` | Mirror (skills only) |
+## How This Prevents Recurrence
 
-## Known Gotchas
+1. **Gate fires before decision tree** — not after, not as a suggestion. It's the first thing evaluated.
+2. **File count is explicit** — no ambiguity about "is this delegation-worthy?"
+3. **Banned excuses** — the specific rationalizations are named and forbidden.
+4. **Two-way check** — generalist can flag when orchestrator sends too much at once.
+5. **Memory rule** — saved to brain-router + engram for cross-session recall.
 
-- **Commander** = Desktop Commander MCP server (not an agent)
-- **Octto** = Claude Code CLI built-in session tools (not an agent)
-- Rebase conflicts can silently overwrite opencode.json — verify agent count after every pull
-- Council models are free tier — rate limits apply
+## Testing
 
-## Commits This Session
+No automated tests for agent prompts. Manual verification:
+- Read orchestrator.md → gate section is present and clear
+- Read generalist.md → escalation section is present
+- Decision tree still intact (steps 1-23 unchanged)
 
 ## Next Steps
-1. Verify all 8 agents pass validation after rebase
-2. Sync latest skills to superpowers repo
-3. Update docs/AGENT-REFERENCE.md with generalist v1.5 changes
 
-## Known Gaps
-- `docs/AGENT-REFERENCE.md` may still reference old generalist capabilities (305-line Swiss Army knife)
+- Merge to main after review
+- Monitor next multi-file task to verify gate fires correctly
+- Consider adding a validation script that checks agent prompts for required sections

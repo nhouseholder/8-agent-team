@@ -125,7 +125,7 @@ Three persistent memory systems survive across sessions:
 
 ## Version
 
-1.6.0 — @fixer removed (didn't exist), @generalist retooled as primary execution specialist with FAST EXECUTION mode, self-audit checkpoint added to orchestrator
+1.7.0 — Mandatory delegation gate added to orchestrator. Circuit breaker fires before every request: 1 file trivial → orchestrator, 1 file non-trivial → @generalist, 2+ files → @generalist (parallel if independent). Banned orchestrator excuses for skipping delegation.
 
 ## License
 

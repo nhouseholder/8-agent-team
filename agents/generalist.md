@@ -115,6 +115,13 @@ Stop and recommend a specialist if:
 - You need broad codebase discovery → @explorer
 - You've made 2 attempts without success → @auditor
 
+## Delegation Escalation (NEW — v1.7.0)
+
+If the orchestrator sends you a task that should have been split across multiple generalists:
+- **10+ files in one task** → Flag it: "This should have been split into parallel batches. Proceeding sequentially but noting the routing issue."
+- **Files span independent domains** (e.g., frontend + backend + tests) → Flag it and suggest parallel dispatch.
+- **Task is ambiguous about file count** → Ask for clarification before starting.
+
 ## Boundary Rules
 
 | @generalist handles | @auditor handles |
