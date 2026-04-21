@@ -25,6 +25,27 @@ Detailed documentation for the agent orchestration system.
 | **council** | Multi-LLM consensus + DEBATE MODE for structured idea evaluation |
 | **generalist** | Plan executor, medium tasks, file safety (backup/verify/revert) |
 
+## Sources of Truth
+
+| Concern | Canonical file |
+|---|---|
+| Core routing behavior | `../agents/orchestrator.md` |
+| Source prompts and per-agent identity | `../agents/<name>.md` |
+| Shared runtime modules | `../agents/_shared/*.md` |
+| Generated runtime prompts | `../agents/generated/<name>.md` |
+| Runtime registry | `../opencode.json` |
+| Release history | `../CHANGELOG.md` |
+
+## Reasoning Contract
+
+The core prompts use a Kahneman-style fast/slow operating heuristic. Treat it as an agent-control model, not a claim of literal cognitive simulation.
+
+- The canonical prompt contract lives in `../agents/_shared/cognitive-kernel.md`
+- Shared memory retrieval and conflict rules live in `../agents/_shared/memory-systems.md`
+- Executable runtime prompts are generated into `../agents/generated/` by `../scripts/compose-prompts.js`
+- `../opencode.json` points only at generated prompts, not source prompts
+- The architecture view of this contract lives in `ARCHITECTURE.md`
+
 ## Version
 
 1.6.0 — Merged refiner→auditor (REFINE MODE), mandatory C1/C2/C3 memory checkpoints, 9→8 agents

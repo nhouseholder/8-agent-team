@@ -1,5 +1,5 @@
 #!/usr/bin/env node
-// gsd-hook-version: 1.0.0
+// memory-context-loader-version: 1.0.0
 // Memory Context Loader — PreToolUse hook
 // Auto-loads context from engram + mempalace on the FIRST tool use of a session.
 // Injects restored context as additionalContext so the agent starts with memory.

@@ -48,6 +48,73 @@ The 8-agent orchestration system implements a **router-dispatcher** pattern with
 └─────────────────────────────────────────────────────────┘
 ```
 
+## Shared Cognitive Kernel
+
+All core agents inherit a shared fast/slow control contract from `agents/_shared/cognitive-kernel.md`, injected at build time into the generated runtime prompts.
+
+- **Fast mode** is the default: one-pass, pattern-matched, minimal-tool execution for clear low-risk work
+- **The orchestrator owns route-level fast/slow choice**, while each specialist owns local fast/slow choice within its own boundary
+- **Delegation packets now carry routing metadata**: `reasoning_mode`, `model_tier`, `budget_class`, and `verification_depth`
+- **Clear prompts are intent-locked before slow mode**: prompt enhancement may tighten safety or verification constraints, but it may not silently recast a workflow/routing request as implementation work
+- **Slow mode** activates only when ambiguity, risk, unfamiliarity, or failed verification justifies extra latency
+- **Slow mode is gist-first**: agents state the bottom-line judgment before gathering supporting detail
+- **Slow mode is a single forward pass** with explicit phase exits; it does not reopen completed phases on unchanged evidence
+- **Slow mode includes one fatal-flaw test** after evidence gathering so agents challenge the current plan once before acting
+- **Slow mode ends in one of three terminal states**: `act`, `ask`, or `escalate`
+- **Memory preflight** happens before non-trivial work so agents reuse prior project decisions, bugfixes, and patterns
+- **Anti-WYSIATI checks** ask what evidence is missing, what competing story fits, what memory may be stale, and what would falsify the current answer
+- **Anti-loop and oscillation guards** prevent repeated re-analysis and boundedly arbitrate repeated specialist disagreement
+- **Expensive reasoning is budget-gated**: deep-reasoning tiers and council fan-out require explicit justification instead of becoming the default reflex
+- **Clear-scope implementation, cleanup, and finalization requests stay concrete**: they default to `@generalist` unless the user explicitly asked for planning/research or the objective itself is unclear
+- This is an operating heuristic influenced by Kahneman-style fast/slow reasoning, not a claim of literal cognitive simulation
+
+## Prompt Composition Pipeline
+
+The prompt system now has two layers:
+
+1. **Source prompts** in `agents/*.md`
+  - Preserve each agent's unique role, skills, boundaries, and output contract
+  - Contain explicit composition markers for shared runtime blocks
+2. **Generated runtime prompts** in `agents/generated/*.md`
+  - Built by `scripts/compose-prompts.js`
+  - Expand shared blocks into the executable prompt surface used by `opencode.json`
+
+Shared runtime modules live in `agents/_shared/`:
+
+- `cognitive-kernel.md` — shared fast/slow reasoning contract
+- `memory-systems.md` — shared retrieval order and precedence rules
+- `completion-gate.md` — shared verification and escalation discipline
+- `council-kernel.md` — council-only arbitration contract
+
+Validation happens in two passes:
+
+- `node scripts/compose-prompts.js` regenerates `agents/generated/*.md` and `agents/generated/manifest.json`
+- `node scripts/validate-agents.js` checks source prompt markers, generated prompt freshness, registry wiring, and reasoning-scenario coverage
+
+## Model Tier Policy
+
+The runtime now distinguishes between reasoning tiers in `opencode.json` instead of mapping every alias to the same model.
+
+- **`fast`** is for low-cost routine execution
+- **`smart`** is the default general-purpose tier for core agents
+- **`deep-reasoning`** is reserved for high-stakes synthesis and optional deep-judge/planner experiments
+- **`council-*`** remains a separate bounded arbitration path with dedicated models per councillor
+
+This separation is policy-first: the orchestrator chooses the justified tier in the delegation packet, validators ensure the tiers remain distinct, and future runtime wiring can consume those aliases directly without redesigning the prompt architecture.
+
+## Per-Agent Slow-Mode Triggers
+
+| Agent | Stay Fast When | Switch to Slow When |
+|---|---|---|
+| **orchestrator** | Route is obvious, task is bounded | Multiple viable routes, high-stakes decision, or repeated failure requires deliberate delegation |
+| **explorer** | Narrow lookup, 1-3 searches answer the question | Search results conflict, subsystem mapping is needed, or data flow spans multiple files |
+| **strategist** | Constraints already known, user wants quick recommendation | Scope is ambiguous, architecture is at stake, or a full spec/plan is required |
+| **researcher** | Narrow doc/API lookup | Topic is unfamiliar, architecture-shaping, or needs multi-source synthesis |
+| **designer** | Existing design system can be extended directly | New visual direction, redesign, or weak UX requires deliberate creative direction |
+| **auditor** | Root cause is visible and fix is bounded | Reproduction is unclear, failures span boundaries, or prior fixes failed |
+| **council** | Skip entirely for routine choices | Run full fan-out only for costly, high-uncertainty decisions |
+| **generalist** | Plan step is clear, scope is bounded | Scope creeps, dependencies are unclear, or verification failure threatens rollback |
+
 ## Agent Roles
 
 ### Routing Layer
@@ -133,6 +200,25 @@ The orchestrator uses a 22-step decision tree:
 ### Brain-Router
 - **Purpose**: Unified routing between structured facts and conversation history
 - **Key operations**: query, save, context, correct, forget
+
+### Retrieval Hierarchy
+1. **Project/task framing** — identify project, subsystem, and question
+2. **Brain-router query** — broad first-pass lookup
+3. **Engram search** — decisions, bugfixes, patterns, and recent sessions
+4. **Engram timeline** — when chronology matters
+5. **Mempalace search** — semantic or verbatim recall only when needed
+
+### Save Conventions
+- `project/<project>/decision/<topic>` for durable choices
+- `project/<project>/bugfix/<topic>` for root-cause and fix history
+- `project/<project>/pattern/<topic>` for reusable implementation patterns
+- `session/<project>/<YYYY-MM-DD>` for resumable session checkpoints
+
+### Conflict Arbitration
+- Live repo evidence and fresh tool output win by default.
+- Fresh official docs or fresh external research outrank stale comments or stale memory for third-party behavior.
+- Structured memory outranks verbatim notes unless exact wording is the point of the lookup.
+- Unresolved material conflicts go back to the orchestrator, which routes one bounded arbitration path instead of silently averaging contradictory signals.
 
 ### Mandatory Checkpoint Protocol (C1/C2/C3)
 - **C1 Pre-Compaction**: Save task state to engram + ledger before any compaction
