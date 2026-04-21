@@ -12,7 +12,7 @@ Detailed specifications for each agent in the orchestration system.
 ### Role
 AI coding orchestrator that routes tasks to specialists for optimal quality, speed, cost, and reliability.
 
-### Decision Tree (19 steps)
+### Decision Tree (22 steps)
 1. Multi-agent chain detection
 2. Context/session management → @generalist
 3. Speed-critical/token-sensitive → @generalist
@@ -24,14 +24,19 @@ AI coding orchestrator that routes tasks to specialists for optimal quality, spe
 9. External research/docs → @researcher
 10. UI/UX polish → @designer
 11. Debugging/audit/review → @auditor
-12. Multi-model consensus → @council
-13. Trivial (<20 lines, one file) → Do it yourself
+12. Multi-model consensus → Council Fan-Out Protocol
+13. Cosmetic edit or trivial lookup → Do it yourself
 14. Writing tests for existing code → @auditor
 15. Refactoring entire module → @strategist → @generalist
 16. New project from scratch → @strategist (SPRINT)
 17. Framework migration → @researcher → @strategist → @auditor
 18. API documentation → @generalist
 19. Performance profiling → @auditor → @generalist
+20. "Improve this" or "refine this" → @auditor (REFINE MODE)
+21. Session end → compactor skill, then debrief if requested
+22. Idea/proposal/"should we" → strategist or council, depending on stakes
+
+**Idea routing:** strategist is the default for feasibility and planning; reserve council for high-stakes trade-offs with multiple viable paths.
 
 ### Chain Protocol
 - Detects sequential language in user requests
@@ -342,18 +347,21 @@ Focused plan executor for medium-complexity tasks. Executes structured plans wit
 | **Debugging** | Light | "Why is this failing?" |
 | **Implementation** | Full | "Update these 5 config files" |
 | **Architecture** | Light | "Should we use X or Y here?" |
-| **Compaction** | Full | "Compact this session", "Save state" |
-| **Summarization** | Full | "What did we do?", "Progress report", "Simplify changes" |
 
 ### Decision Protocol
 1. Is this a specialist job? → Recommend the right agent
 2. Can I handle it? → Execute directly
 3. Am I out of my depth? → Stop and recommend escalation
 
-### Context Compaction
-- Preserves: decisions with rationale, file paths, open questions, patterns
-- Discards: exploration dead-ends, verbose errors, intermediate steps
-- Saves to: `thoughts/ledgers/CONTINUITY_YYYY-MM-DD_HHMM.md`
+### Execution Rules
+- Backup before non-trivial edits
+- Verify after each step or batch of changes
+- Revert on failed verification instead of pushing through
+- Stop when scope becomes architectural or ambiguous
+
+### Pre-Compaction Checkpoint
+- Save current task, decisions, changed files, and next action before any compaction
+- Rehydrate from the checkpoint before resuming execution
 
 ### Boundary Rules (vs @auditor)
 - **@generalist:** Know WHAT to change → medium tasks, configs, docs, refactors
@@ -370,6 +378,10 @@ Focused plan executor for medium-complexity tasks. Executes structured plans wit
 - Tests passed: [yes/no/skip reason]
 - LSP diagnostics: [clean/errors found/skip reason]
 </verification>
+
+<next>
+Recommended next step or "complete"
+</next>
 ```
 
 ### Escalation Triggers
@@ -378,7 +390,3 @@ Focused plan executor for medium-complexity tasks. Executes structured plans wit
 - UI needs visual polish beyond "functional"
 - Decision has long-term architectural consequences
 - Need to understand an unfamiliar library
-
----
-
-## @generalist (Deploy)

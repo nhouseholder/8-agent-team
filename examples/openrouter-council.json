@@ -69,14 +69,6 @@
       "prompt_file": "agents/generalist.md"
     }
   },
-  "permission": {
-    "read": {
-      "~/.config/opencode/get-shit-done/*": "allow"
-    },
-    "external_directory": {
-      "~/.config/opencode/get-shit-done/*": "allow"
-    }
-  },
   "provider": {
     "openrouter": {
       "options": {

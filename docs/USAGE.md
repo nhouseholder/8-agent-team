@@ -4,7 +4,7 @@
 
 ### @orchestrator (Router)
 
-The orchestrator is the entry point for all requests. It classifies every message using a 19-step decision tree and dispatches to the right agent.
+The orchestrator is the entry point for all requests. It classifies every message using a 22-step decision tree and dispatches to the right agent.
 
 **You don't call it directly** — it's the default agent. Just talk to it naturally.
 
@@ -124,17 +124,18 @@ Runs consensus across multiple models for high-stakes decisions.
 
 ### @generalist (Medium Tasks)
 
-Swiss Army knife for tasks too involved for a quick edit but not warranting a specialist.
+Focused plan executor for medium-complexity tasks. It follows plans with backup, verification, and revert checkpoints, or handles bounded multi-file work autonomously.
 
 **Capabilities:**
-- Light exploration, research, design, debugging
-- Full implementation for clear-scope tasks
-- Context compaction and session continuity
+- Structured plan execution
+- Autonomous medium-complexity implementation
+- Multi-file config, docs, and tooling updates
+- Pre-compaction checkpointing when session state must be preserved
 
 **Example prompts:**
 - "Update these 5 config files for the new environment"
 - "Write a README for this project"
-- "Compact the current session context"
+- "Execute this implementation plan"
 - "Add error handling to these API endpoints"
 
 **Output:** Summary of changes, verification status, and next steps.
@@ -155,28 +156,6 @@ Recommends highest-impact next actions scoped to the current project.
 - "Review the handoff from last session"
 
 **Output:** Prioritized recommendations with evidence from git state, handoffs, and memory.
-
-### @generalist (Deploy)
-
-> **Note:** Shipper was merged into @generalist in v1.3.0.
-
-Sync, bump, commit, push, deploy, verify, and handoff. See @generalist section above.
-
-### @generalist (Summaries)
-
-Produces concise, factual summaries of work done.
-
-**Modes:**
-- **SESSION SUMMARY**: "What did we do?" — bullets with files changed → outcome
-- **PROGRESS TRACKER**: "Progress report" — N/M tasks, percentage, ETA
-- **CODE SIMPLIFICATION**: "Simplify changes" — review diff for simpler alternatives
-
-**Example prompts:**
-- "Summarize what we did today"
-- "Progress report"
-- "Can these changes be simplified?"
-
-**Output:** Factual summary with git data, current state, and next step.
 
 ## Multi-Agent Chains
 

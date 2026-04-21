@@ -2,6 +2,29 @@
 
 All notable changes to the Agent Orchestration System.
 
+- Added a build-time prompt composition pipeline that generates `agents/generated/*.md` and `agents/generated/manifest.json`
+- Added shared `completion-gate.md` and `council-kernel.md` runtime modules
+- Switched `opencode.json` to execute generated prompts instead of raw source prompts
+- Rebuilt `scripts/validate-agents.js` to check composition markers, generated prompt freshness, registry wiring, and reasoning scenarios
+## [Unreleased]
+
+### Fixed
+- Reframed the fast/slow model as a Kahneman-style operating contract instead of a literal dual-process claim
+- Locked clear prompts against silent reinterpretation and stopped slow-mode rerouting on unchanged evidence
+- Kept concrete patch/wire/finalize/update/integrate requests on the execution route instead of bouncing them into meta-analysis or planning
+- Synchronized public docs with the 22-step orchestrator routing and the current `@generalist` prompt
+- Removed the GSD workflow layer from the repo surface and restored docs/config to the core 8-agent product
+- Corrected handoff version-history labels to follow `CHANGELOG.md` as the canonical release history
+
+### Changed
+- Added gist-first slow mode, anti-WYSIATI checks, memory conflict precedence, and bounded council/arbitration rules across the core prompts
+- Made slow mode a linear single-pass sequence with explicit terminal states and added validator coverage for intent lock / finite reasoning
+- Added warning-only reasoning-contract checks to `scripts/validate-agents.js`
+- Simplified `scripts/validate-agents.js` back to the core 8-agent validation surface
+- Added a shared cognitive kernel and per-agent fast/slow reasoning triggers across the core prompts
+- Added project/date/session memory retrieval conventions to the shared memory protocol
+- Added repo ignore rules for local `.claude/worktrees/` runtime mirrors
+
 ## [1.6.0] - 2026-04-20
 
 ### Merged: 9 → 8 Agents

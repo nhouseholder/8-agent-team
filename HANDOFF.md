@@ -4,25 +4,23 @@
 **Version:** 1.6.0
 **Status:** Production-ready, all changes committed and pushed
 
+> `CHANGELOG.md` is the canonical release history. This handoff summarizes the consolidation session and should stay aligned with it.
+
 ## What Was Done
 
-### Merged 3 Agent Pairs (v1.0)
+### Merged 3 Agent Pairs (v1.2)
 1. **architect + strategist → @strategist** — Unified advisory agent with 8 modes: SKIP, LITE, FULL (spec→plan), SPRINT, ASSESSMENT, BRIEFING, PREDICTIVE, OPPORTUNISTIC. Deleted `agents/architect.md`.
 2. **debrief → @generalist** — Added Summarization Protocol (SESSION SUMMARY, PROGRESS TRACKER, CODE SIMPLIFICATION) to generalist's capability spectrum. Deleted `agents/debrief.md`.
 3. **curator + refiner → @refiner** — Single agent with INDEX MODE (memory scanning, backlog maintenance) and REFINE MODE (conservative improvements with tiered action protocol). Deleted `agents/curator.md`.
 
-### Brainstormer → Explorer Rename (v1.1)
+### Brainstormer → Explorer Rename (v1.3)
 - Renamed `brainstormer` → `explorer` for clarity
 - Deleted `agents/brainstormer.md`
 
-### Shipper Merge + Anti-Loop Guards (v1.3)
+### Shipper Merge + Anti-Loop Guards (v1.4)
 - Merged shipper into generalist (not registered in opencode.json → broken routing)
 - Replaced advisory-only anti-loop guards with structural circuit breakers (table-based processing flow)
 - Codified mempalace as READ-ONLY — engram + brain-router for all writes
-
-### Refiner Removal (v1.4)
-- Removed refiner agent (9→8) — capabilities covered by opportunistic-improvement skill + compactor + memory systems
-- Deleted `agents/refiner.md`
 
 ### Refiner → Auditor REFINE MODE (v1.6)
 - Merged refiner agent into auditor as REFINE MODE (9→8 agents)
@@ -53,7 +51,7 @@
 
 ### Stale Reference Purge
 - 13 files cleaned across docs/, examples/, and root — 87 insertions, 152 deletions
-- Zero stale references to brainstormer, shipper, architect, librarian, oracle, refiner remain
+- Historical references remain in `CHANGELOG.md` and this handoff only; active docs/config should point to the 8-agent surface
 
 ## Current 8-Agent Roster
 

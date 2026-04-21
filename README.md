@@ -74,28 +74,65 @@ The repo `opencode.json` uses a placeholder. You need your own key:
 
 - **22-step decision tree** classifies every request and routes to the right agent
 - **Memory Retrieval Protocol** — checks engram/mempalace/brain-router before routing
+- **Shared Cognitive Kernel** — every core agent defaults to fast mode and escalates to slow mode only when ambiguity, risk, or failures justify it
 - **Prompt Enhancement Protocol** — silently clarifies vague prompts (1-2 questions max)
 - **Multi-Agent Chains** — sequential requests execute automatically, max depth 4
 - **Council DEBATE MODE** — structured idea evaluation (advocate for/against → judge → verdict)
 - **Chain Recovery** — failed steps retry, escalate, or pause for user input
 - **Persistent Memory** — three MCP memory systems survive across sessions
-- **Validation** — `scripts/validate-agents.js` ensures all agents meet format requirements
+- **Validation** — `scripts/validate-agents.js` checks source markers, generated prompt freshness, registry wiring, and reasoning-scenario integrity
 
 ## Architecture
 
 ```
 agents/
-├── orchestrator.md      # Router with decision tree, chain protocol, memory + prompt enhancement
-├── explorer.md          # Codebase exploration specialist
-├── strategist.md        # Architecture, planning, spec-writing (8 modes)
-├── researcher.md        # External research with source hierarchy
-├── designer.md          # UI/UX with intentional minimalism
-├── auditor.md           # Debug, review, improve, fix (READ/FIX/REFINE modes)
-├── council.md           # Multi-LLM consensus + DEBATE MODE
-├── generalist.md        # Medium tasks, compaction, summarization, deploy, handoff
+├── orchestrator.md      # Source prompt: router with decision tree, chain protocol, memory + prompt enhancement
+├── explorer.md          # Source prompt: codebase exploration specialist
+├── strategist.md        # Source prompt: architecture, planning, spec-writing (8 modes)
+├── researcher.md        # Source prompt: external research with source hierarchy
+├── designer.md          # Source prompt: UI/UX with intentional minimalism
+├── auditor.md           # Source prompt: debug, review, improve, fix (READ/FIX/REFINE modes)
+├── council.md           # Source prompt: multi-LLM consensus + DEBATE MODE
+├── generalist.md        # Source prompt: plan executor, bounded implementation, verification discipline
+├── generated/           # Runtime prompts produced by scripts/compose-prompts.js
+│   ├── orchestrator.md
+│   ├── explorer.md
+│   └── ...
 └── _shared/
-    └── memory-systems.md  # Shared memory reference for all agents
+    ├── cognitive-kernel.md # Shared fast/slow control contract
+    ├── memory-systems.md   # Shared memory retrieval and precedence rules
+    ├── completion-gate.md  # Shared completion and escalation discipline
+    └── council-kernel.md   # Shared council arbitration contract
+
+scripts/
+├── compose-prompts.js            # Builds agents/generated/* and manifest.json
+├── validate-agents.js            # Validates source, generated, registry, scenarios
+└── validate-reasoning-scenarios.js # Lightweight fast/slow architecture checks
 ```
+
+## Cognitive Model
+
+The system uses a Kahneman-style fast/slow operating contract across the full 8-agent team. It is an agent-control heuristic, not a claim that the repo faithfully implements settled human dual-process psychology.
+
+- **Fast mode** is the default for narrow, familiar, low-risk work
+- **The orchestrator owns route-level fast/slow decisions**, while each specialist owns local fast/slow decisions inside its own boundary
+- **Slow mode** is triggered by ambiguity, architectural stakes, repeated failure, or missing prior patterns
+- **Slow mode starts with a bottom-line gist**, then gathers only the detail that can change or falsify that gist
+- **Memory preflight** happens before non-trivial work so agents reuse prior decisions instead of rediscovering them
+- **Anti-WYSIATI and conflict checks** run before high-confidence completion on ambiguous or high-stakes work
+- **Council** is the expensive slow path for genuinely high-stakes decisions, not routine planning
+- **Fast and slow are control modes, not value judgments** — fast is not automatically biased, and slow is not automatically better
+
+## Sources of Truth
+
+| Concern | Canonical file |
+|---|---|
+| Core routing behavior | `agents/orchestrator.md` |
+| Source prompts and per-agent identity | `agents/<name>.md` |
+| Shared runtime modules | `agents/_shared/*.md` |
+| Generated runtime prompts | `agents/generated/<name>.md` |
+| Runtime registry and prompt file wiring | `opencode.json` |
+| Release history | `CHANGELOG.md` |
 
 ## Multi-Agent Chains
 
@@ -119,8 +156,10 @@ Three persistent memory systems survive across sessions:
 ## Configuration
 
 - **Config file**: `opencode.json`
-- **Agent prompts**: `agents/<name>.md`
-- **Shared resources**: `agents/_shared/memory-systems.md`
+- **Source prompts**: `agents/<name>.md`
+- **Shared runtime modules**: `agents/_shared/*.md`
+- **Generated runtime prompts**: `agents/generated/<name>.md`
+- **Prompt builder**: `scripts/compose-prompts.js`
 - **Validation**: `scripts/validate-agents.js`
 
 ## Version
