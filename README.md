@@ -13,7 +13,7 @@ A multi-agent coding orchestration system for OpenCode. An **orchestrator** rout
 | **designer** | UI/UX implementation | "Build a dashboard", "Improve this component" |
 | **auditor** | Debugging, audit, code review | "Fix this bug", "Review this code", "Write tests" |
 | **council** | Multi-LLM consensus & debate | "What's the best approach?", "Should we...?" |
-| **generalist** | Plan executor, medium tasks | "Execute this plan", "Update these configs", "Refactor" |
+| **generalist** | Fast execution + plan executor | "Create these files", "Execute this plan", "Refactor" |
 
 ## How It Works
 
@@ -125,7 +125,7 @@ Three persistent memory systems survive across sessions:
 
 ## Version
 
-1.5.0 — Retooled generalist as plan executor (backup/verify/revert), compaction/deploy moved to skills
+1.6.0 — @fixer removed (didn't exist), @generalist retooled as primary execution specialist with FAST EXECUTION mode, self-audit checkpoint added to orchestrator
 
 ## License
 
