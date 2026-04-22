@@ -30,7 +30,7 @@ The single planning skill. Replaces spec-interview, brainstorming, writing-plans
 # Detect project
 pwd && git remote get-url origin 2>/dev/null
 # Load existing specs, plans, handoffs
-ls docs/superpowers/specs/ docs/superpowers/plans/ handoffs/ 2>/dev/null
+ls docs/specs/ docs/plans/ handoffs/ 2>/dev/null
 # Read CLAUDE.md, AGENTS.md, README if they exist
 ```
 
@@ -120,7 +120,7 @@ Then [expected outcome]
 - [What the implementer must know]
 ```
 
-Save to `docs/superpowers/specs/YYYY-MM-DD-<topic>-spec.md`. Commit.
+Save to `docs/specs/YYYY-MM-DD-<topic>-spec.md`. Commit.
 
 ## Phase 5: WRITE PLAN
 
@@ -164,7 +164,7 @@ Save to `docs/superpowers/specs/YYYY-MM-DD-<topic>-spec.md`. Commit.
 - [ ] **Step 5:** Commit
 ```
 
-Save to `docs/superpowers/plans/YYYY-MM-DD-<topic>-plan.md`. Commit.
+Save to `docs/plans/YYYY-MM-DD-<topic>-plan.md`. Commit.
 
 **Output:** "Plan complete at `<path>`. Switch to Sonnet (`/model sonnet`) before executing — all decisions are baked in, execution is mechanical."
 

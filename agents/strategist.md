@@ -55,8 +55,8 @@ Present 2-3 approaches with trade-offs in one message. Recommend one. Get user p
    - Core behavior, inputs/outputs, edge cases, constraints, integration points, out of scope
    - Stop asking when you have full clarity.
 3. **Approach Design** — Propose 2-3 meaningfully different approaches with trade-offs.
-4. **Write SPEC.md** — Save to `docs/superpowers/specs/YYYY-MM-DD-<topic>-spec.md`
-5. **Write Plan** — Classify rigor level (site update → bullet list, new feature → step-by-step, algorithm → detailed + hypothesis). Save to `docs/superpowers/plans/YYYY-MM-DD-<topic>-plan.md`
+4. **Write SPEC.md** — Save to `docs/specs/YYYY-MM-DD-<topic>-spec.md`
+5. **Write Plan** — Classify rigor level (site update → bullet list, new feature → step-by-step, algorithm → detailed + hypothesis). Save to `docs/plans/YYYY-MM-DD-<topic>-plan.md`
 
 ## SPRINT Mode — Greenfield
 FRAME → SKETCH → DECIDE → PROTOTYPE → TEST

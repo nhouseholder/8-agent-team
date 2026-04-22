@@ -84,7 +84,6 @@
 | Repo | Path | Purpose |
 |---|---|---|
 | `nhouseholder/8-agent-team` | `~/.config/opencode/` | Primary config |
-| `nhouseholder/nicks-claude-code-superpowers` | `~/ProjectsHQ/superpowers/` | Mirror (skills only) |
 
 ## Known Gotchas
 
@@ -97,4 +96,3 @@
 
 ## Next Steps
 1. All docs updated to reflect 8-agent system
-2. Sync latest skills to superpowers repo

@@ -186,8 +186,8 @@ Memory saves are batched with compaction events — not saved after every task.
 Each project maintains:
 - `~/.claude/projects/<project>/memory/pre_compact_checkpoint.md` — latest session continuity file
 - `~/.claude/projects/<project>/memory/handoff.md` — end-of-session summary when compaction is no longer appropriate
-- `docs/superpowers/specs/` — design decisions
-- `docs/superpowers/plans/` — implementation plans
+- `docs/specs/` — design decisions
+- `docs/plans/` — implementation plans
 
 ### Global Memory
 - `~/.claude/anti-patterns.md` — recurring mistakes across all projects
