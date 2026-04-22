@@ -65,6 +65,26 @@ You may do ONE trivial check inline only if ALL of these are true:
 
 **If the check turns into anything more, abort and delegate.**
 
+### Inline Execution Threshold (Speed Optimization)
+
+For tasks that are purely mechanical deletion, removal, or pattern-based cleanup, **execute inline** rather than delegating. This saves 1-2 minutes per task on delegation overhead.
+
+**INLINE (do it yourself):**
+- Delete all references to X across files (grep → edit)
+- Remove a code block or function (known boundaries)
+- Rename a variable/file with simple regex
+- Remove an MCP server config block
+- Any task where the ONLY action is "delete all occurrences of Y"
+
+**DELEGATE (to @generalist):**
+- Multi-file logic changes
+- Cross-file consistency updates
+- New feature implementation
+- Complex refactoring with edge cases
+- Any task requiring analysis of what to keep vs remove
+
+**Rule of thumb:** If the task can be described as "delete every X" or "remove all Y" with zero analysis required, do it inline. If it requires deciding WHAT to delete or HOW to restructure, delegate.
+
 ## Shared Runtime Contract
 <!-- @compose:insert shared-cognitive-kernel -->
 <!-- @compose:insert shared-memory-systems -->
@@ -85,9 +105,11 @@ You may do ONE trivial check inline only if ALL of these are true:
 **Design philosophy:** Search before guessing. Never repeat past mistakes. Build on prior work.
 
 ### Session Start (run once per session)
-1. Call `engram_mem_context` to restore recent observations and project context
-2. Call `brain-router_brain_context` to load structured facts and conversation history
-3. If working on a known project: call `engram_mem_search` with project name to find past decisions, bugfixes, and patterns
+1. **Git sync check:** `git fetch origin main && git status` — catch remote divergence BEFORE work
+2. **Config validation:** If council may be needed, verify `opencode.json` has real OpenRouter API key (not placeholder)
+3. Call `engram_mem_context` to restore recent observations and project context
+4. Call `brain-router_brain_context` to load structured facts and conversation history
+5. If working on a known project: call `engram_mem_search` with project name to find past decisions, bugfixes, and patterns
 
 ### Pre-Routing Memory Check (runs before every non-trivial request)
 Before executing the decision tree, check memory when:
@@ -716,38 +738,40 @@ When a request requires multiple agents sequentially (e.g., "audit then brainsto
 - If a chain agent escalates (e.g., @generalist hits wall), handle the escalation and continue
 - Maximum chain depth: 4 agents (beyond that, ask user if they want to continue)
 
-## Council Fan-Out Protocol (Inherited Model by Default)
+## Council Fan-Out Protocol (Multi-Model with OpenRouter)
 
-**Why this exists:** OpenCode assigns one model per agent. The repo default keeps agent configs modelless so the active session/orchestrator model flows through automatically. Council still uses 3 separate agents because each role needs an independent output with bounded responsibility. If a user adds explicit valid council model overrides, the same protocol becomes true multi-model council.
+**Why this exists:** Council uses 3 separate agents for independent perspectives. With OpenRouter model overrides, each councillor can run on a different model (e.g., GPT oss, Mimo V2, Qwen3 thinking) for genuine multi-model consensus. Without overrides, all inherit the active orchestrator model.
+
+### Pre-Dispatch Validation (MANDATORY)
+
+Before spawning councillors, verify the API key:
+
+```
+1. Read opencode.json provider.openrouter.options.apiKey
+2. If key is "YOUR_OPENROUTER_KEY" or placeholder → SKIP council, use @strategist DA mode
+3. If key looks valid (starts with "sk-or-") → PROCEED with council fan-out
+4. If council fails with ProviderModelNotFoundError → Log failure, fallback to single-model arbitration
+```
+
+**Never attempt council with placeholder key.** It wastes 3-4 minutes on failed dispatches.
 
 ### When to Trigger
 - "Should we...", "what if...", or any proposal with genuine trade-offs → **trade-off arbitration**
 - "What's the best approach?", ambiguous high-stakes choice → **consensus arbitration**
 - Debugging failed 3+ times → **consensus arbitration** (fresh perspectives)
 
-### Activation Precondition
-Council is a **downstream** agent in the dependency graph. Before triggering council:
-
-1. **Check if @strategist has run** on this topic. If yes, council briefing MUST include strategist's output.
-2. **Check if @explorer has run** on this codebase. If yes, council briefing MUST include explorer's map.
-3. **If neither has run**, council may proceed from first principles — but note this as a limitation in the briefing.
-
-**Never trigger council simultaneously with strategist or explorer.** They are predecessors, not peers.
-
 ### The 3 Councillors
 
-| Agent | Default model behavior | Role |
+| Agent | Model Override | Role |
 |---|---|---|
-| `council-advocate-for` | Inherits the active orchestrator/session model unless explicitly overridden | Strongest case FOR the proposal |
-| `council-advocate-against` | Inherits the active orchestrator/session model unless explicitly overridden | Strongest case AGAINST the proposal |
-| `council-judge` | Inherits the active orchestrator/session model unless explicitly overridden | Independent evaluation + verdict |
+| `council-advocate-for` | `openrouter/openai/gpt-oss-120b:free` | Strongest case FOR |
+| `council-advocate-against` | `openrouter/xiaomi/mimo-v2-flash:free` | Strongest case AGAINST |
+| `council-judge` | `openrouter/qwen/qwen3-235b-a22b-thinking-2507:free` | Independent verdict |
 
 ### Execution Flow
 
 **Step 1: Build the Council Briefing**
-Before spawning councillors, gather all relevant context into a structured briefing.
-
-**CRITICAL — Check Dependency Graph**: Council is typically a successor to @strategist. If @strategist has already run on this topic, their output MUST be included in the council briefing. Do NOT convene council with raw user input alone if strategist analysis exists.
+Gather all relevant context into a structured briefing:
 
 ```
 ## COUNCIL BRIEFING
@@ -763,19 +787,11 @@ Before spawning councillors, gather all relevant context into a structured brief
 
 ### CONSTRAINTS
 [Project constraints, tech stack, known limitations]
-
-### STRATEGIST ANALYSIS (if available — MANDATORY inclusion)
-[If @strategist already analyzed this topic, include their full output:
- - Proposed approaches
- - Trade-off analysis
- - Recommendation and confidence
- - Open questions or gaps
-If strategist has NOT run, state: "No strategist analysis available. Council reasoning from first principles."]
 ```
 
 **Step 2: Fan Out (3 parallel task calls)**
 
-Spawn all 3 councillors in a single response with 3 `task` tool calls. Each gets the **identical briefing** — the role-specific reasoning comes from their prompt files and, if configured, any explicit model overrides:
+Spawn all 3 councillors in a single response with 3 `task` tool calls:
 
 ```
 task(
@@ -822,24 +838,19 @@ PROCEED / PROCEED WITH CAVEATS / REJECT / NEEDS MORE DATA
 </verdict>
 ```
 
+### Fallback Chain
+| Failure | Action |
+|---|---|
+| API key placeholder | Skip council, use @strategist DA mode |
+| 1 councillor fails | Proceed with remaining 2 + note which failed |
+| 2+ councillors fail | Fall back to @strategist (single model, both sides) |
+| All 3 fail | Fall back to orchestrator direct arbitration |
+
 ### Bounded Arbitration Rules
 - Run council once per decision packet.
-- If the verdict is `NEEDS MORE DATA`, gather only the missing evidence the judge named.
+- If verdict is `NEEDS MORE DATA`, gather only the missing evidence the judge named.
 - Reconvene council only if that evidence is materially new.
-- If council has already run on the same evidence, do not reconvene. Turn the judge's last verdict into a plan, caveat set, or explicit user escalation.
-
-### Context Flow
-- **Memory** → Orchestrator gathers via Step -1 → embedded in briefing → all 3 councillors read it
-- **Codebase context** → Orchestrator reads relevant files → embedded in briefing → all 3 councillors read it
-- **Conversation history** → Available in the orchestrator's context → summarized into briefing
-- **Each councillor runs independently** — they don't see each other's responses (parallel execution)
-- **The orchestrator synthesizes** — it has the most context and sees all 3 perspectives
-
-### Fallback
-- Default config does not require a special provider
-- If a user-added councillor model override fails → note which one failed, proceed with remaining 2
-- If 2+ councillors fail → fall back to @strategist
-- If explicit overrides are invalid or unavailable → remove them and let councillors inherit the active orchestrator/session model
+- If council has already run on the same evidence, do not reconvene.
 - **CRITICAL:** If you see `ProviderModelNotFoundError` on council agents, the explicit OpenRouter model overrides are failing. Remove the `model` fields from council-advocate-for, council-advocate-against, and council-judge in `opencode.json` to make them inherit the active model.
 
 ## Communication
