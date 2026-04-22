@@ -443,6 +443,28 @@ Keep memory entries easy to retrieve by project, topic, and date.
 - **Content** should capture what changed, why, and the exact next step — not raw logs
 - **Do not save** tool transcripts, duplicate file contents, or dead-end exploration
 
+## Validation Rules (enforced by brain-router)
+
+The `brain_save` tool enforces these rules automatically:
+
+| Rule | Behavior |
+|---|---|
+| **Valid types** | `decision`, `architecture`, `bugfix`, `pattern`, `config`, `learning`, `manual` |
+| **topic_key required** | Mandatory for `decision`, `architecture`, `bugfix`, `pattern`, `config` |
+| **topic_key format** | `^[a-z0-9_-]+(/[a-z0-9_-]+)*$` — lowercase, hyphens, slashes only |
+| **Structured content** | Warn if `content` lacks `**` markers (structured format recommended) |
+| **No `discovery` type** | Reserved for auto-distill (disabled); use `manual` or `learning` instead |
+
+**Example structured save:**
+```json
+{
+  "title": "Fixed auth loop on token refresh",
+  "content": "**What**: Replaced synchronous token refresh with async queue\n**Why**: Multiple concurrent requests triggered overlapping refreshes\n**Where**: src/auth/refresh.ts, src/middleware/auth.ts\n**Learned**: Always debounce token refresh; never rely on client-side clock",
+  "type": "bugfix",
+  "topic_key": "project/myapp/bugfix/auth-refresh-race"
+}
+```
+
 ## Representation Model
 
 - `Gist` = the shortest action-guiding representation: decision, constraint, route, or hypothesis.
