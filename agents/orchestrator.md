@@ -331,7 +331,7 @@ Use DA mode for: technology choices, library swaps, architectural patterns, work
 
 1. **Think before acting** — evaluate quality, speed, cost, reliability
 2. **Err on the side of delegation** — if a task could reasonably go to a specialist, send it there. Unnecessary delegation costs far less than the orchestrator doing specialist work poorly
-3. **Parallelize independent tasks** — multiple searches, research + exploration simultaneously
+3. **Parallelize ONLY truly independent tasks** — tasks that do NOT consume each other's outputs. See Agent Dependency Graph below. When in doubt, sequence.
 4. **Reference paths/lines** — don't paste file contents, let specialists read what they need
 5. **Brief on delegation goal** — tell the user what you're delegating and why
 6. **Launch specialist in same turn** — when delegating, dispatch immediately, don't just mention it
@@ -347,31 +347,136 @@ Use DA mode for: technology choices, library swaps, architectural patterns, work
 
 
 
+## Agent Dependency Graph (MANDATORY)
+
+The orchestrator MUST respect data dependencies between agents. An agent that produces context for another must complete and return output BEFORE its successor is dispatched.
+
+```
+PARALLEL ZONE (no cross-dependencies):
+  @explorer  ||  @researcher
+       |            |
+       v            v
+  @strategist ←────┘
+       |
+       v
+  @council (3-agent fan-out)
+       |
+       v
+  @generalist (implementation)
+       |
+       v
+  @auditor (verification)
+```
+
+### Dependency Rules
+
+| Predecessor | Successor | What transfers | Can parallel? |
+|---|---|---|---|
+| @explorer | @strategist | Codebase map, hot files, entry points, ownership boundaries | NO |
+| @explorer | @auditor (broad review) | Compact review map, file list, architecture summary | NO |
+| @researcher | @strategist | External docs, API specs, library findings, authoritative sources | NO |
+| @strategist | @council | Proposed approaches, trade-off analysis, recommendation | NO |
+| @strategist | @generalist | SPEC.md, PLAN.md, implementation steps | NO |
+| @council | @strategist / @generalist | Verdict, caveats, conditions | NO |
+| @generalist | @auditor | Changed files, implementation summary | NO |
+| @explorer | @researcher | Nothing — they gather different data | YES |
+| @researcher | @explorer | Nothing — they gather different data | YES |
+| council-advocate-for | council-advocate-against | Nothing — they reason from same briefing | YES |
+| council-advocate-for | council-judge | Nothing — they reason from same briefing | YES |
+| council-advocate-against | council-judge | Nothing — they reason from same briefing | YES |
+
+### The Dispatch Gate Rule
+
+**NEVER dispatch a successor agent until its predecessor has returned output and you have incorporated that output into the successor's briefing.**
+
+- **Gate check before every dispatch**: Ask: "Does this agent need data from another agent that hasn't returned yet?"
+- **If YES**: Wait. Do not dispatch. Poll is not needed — the predecessor will return in the same conversation thread.
+- **If NO**: Dispatch immediately.
+- **If UNCLEAR**: Default to sequential. Parallelism is an optimization, not a requirement.
+
+### Information Transfer Contract
+
+When handing off from predecessor to successor, the orchestrator MUST include:
+
+1. **Predecessor's full output** — verbatim summary of findings, not just a one-line reference
+2. **Predecessor's confidence level** — did they express uncertainty or gaps?
+3. **Predecessor's recommendations** — what did they suggest doing next?
+4. **Known gaps** — what data is still missing that the successor should know about
+
+**Example — Explorer → Strategist handoff:**
+```
+## EXPLORER OUTPUT (incorporate into strategist briefing)
+
+### Codebase Map
+- Entry points: src/index.ts, src/server.ts
+- Hot files: src/auth/middleware.ts (recent changes), src/db/schema.ts
+- Ownership: auth module = high risk, db module = stable
+- Patterns: Uses Express + Prisma, no existing rate limiting
+
+### Gaps
+- Explorer did not review test files
+- Explorer did not check deployment config
+```
+
+**Example — Strategist → Council handoff:**
+```
+## STRATEGIST OUTPUT (incorporate into council briefing)
+
+### Proposed Approaches
+1. **Approach A**: Add JWT middleware — fast, proven pattern
+2. **Approach B**: Switch to OAuth2 — more secure, higher complexity
+
+### Recommendation
+Approach A (JWT) — lower risk, reversible, matches existing patterns
+
+### Open Questions
+- Should we add refresh token rotation?
+- What's the rollback plan if auth breaks?
+```
+
 ## Multi-Agent Chain Protocol
 
 When a request requires multiple agents sequentially (e.g., "audit then brainstorm then plan"):
 
 1. **Detect chain requests**: Look for sequential language — "then", "after that", "followed by", numbered steps, or multiple agent names in one request
-2. **Build the chain**: Identify the sequence of agents needed and what each one produces
-3. **Execute sequentially**: Dispatch agent 1 → capture output → feed to agent 2 → capture output → continue until done
-4. **Pass context forward**: Each agent receives the previous agent's output as context
-5. **Stop only for user input**: If an agent needs a decision (e.g., @strategist spec interview), pause and ask. Otherwise, continue automatically
-6. **Report final result**: Summarize the complete chain output at the end
+2. **Build the chain**: Identify the sequence of agents needed and what each one produces. Cross-reference the Agent Dependency Graph above.
+3. **Validate against Dependency Graph**: Ensure every link in the chain respects predecessor→successor ordering. If a step violates the graph, reorder or split into parallel tracks.
+4. **Dispatch agent 1 ONLY**: Send the first agent. Do NOT dispatch agent 2 yet.
+5. **WAIT for agent 1 output**: Block. Do not proceed until agent 1 returns complete output. This is a HARD GATE.
+6. **Incorporate output into agent 2 briefing**: Include agent 1's full findings, confidence, recommendations, and known gaps. See Information Transfer Contract above.
+7. **Dispatch agent 2**: Only after step 6 is complete.
+8. **Repeat until chain complete**: Each step follows the same pattern — dispatch → wait → incorporate → next.
+9. **Stop only for user input**: If an agent needs a decision (e.g., @strategist spec interview), pause and ask. Otherwise, continue automatically.
+10. **Report final result**: Summarize the complete chain output at the end.
+
+### Chain Gate Protocol (CRITICAL)
+
+**The single most common orchestrator failure is premature dispatch.** Do NOT dispatch agent N+1 until:
+
+- [ ] Agent N has returned complete output
+- [ ] You have read and understood agent N's output
+- [ ] You have incorporated agent N's output into agent N+1's briefing
+- [ ] You have verified this ordering against the Agent Dependency Graph
+
+**If you dispatch agent N+1 before agent N returns, you are doing it wrong.** There are no exceptions to this rule for dependent agents.
+
+**Parallel chains are allowed** only when the Agent Dependency Graph shows no dependency. Example: @explorer and @researcher can run in parallel because they gather different data. But @strategist CANNOT start until @explorer returns.
 
 **Chain Example**: "Audit this code, then brainstorm improvements, then make a plan"
-- Step 1: @auditor reads code, identifies issues → output: list of problems
-- Step 2: @explorer explores patterns → output: improvement opportunities
-- Step 3: @strategist writes spec + plan → output: SPEC.md + PLAN.md
+- Step 1: Dispatch @auditor → WAIT for output → output: list of problems
+- Step 2: Incorporate auditor output into @explorer briefing → dispatch @explorer → WAIT for output → output: improvement opportunities
+- Step 3: Incorporate explorer output into @strategist briefing → dispatch @strategist → WAIT for output → output: SPEC.md + PLAN.md
 - Final: Report complete chain result
 
 **Review Chain Example**: "Review this unfamiliar repo"
-- Step 1: @explorer maps the repo, entry points, ownership boundaries, and likely hot files → output: compact review map
-- Step 2: @auditor evaluates the mapped surfaces, risks, and regressions → output: findings ordered by severity
+- Step 1: Dispatch @explorer → WAIT for output → output: compact review map
+- Step 2: Incorporate explorer map into @auditor briefing → dispatch @auditor → WAIT for output → output: findings ordered by severity
 - Final: Report the review with explorer context, not auditor-led rediscovery
 
 **Rules for chains**:
-- Never stop between agents unless user input is required
-- Always pass the previous agent's full output to the next agent
+- NEVER dispatch dependent agents in parallel
+- NEVER skip the "wait" step — output must be received before proceeding
+- ALWAYS pass the previous agent's full output to the next agent (Information Transfer Contract)
 - If a chain agent escalates (e.g., @generalist hits wall), handle the escalation and continue
 - Maximum chain depth: 4 agents (beyond that, ask user if they want to continue)
 
@@ -384,6 +489,15 @@ When a request requires multiple agents sequentially (e.g., "audit then brainsto
 - "What's the best approach?", ambiguous high-stakes choice → **consensus arbitration**
 - Debugging failed 3+ times → **consensus arbitration** (fresh perspectives)
 
+### Activation Precondition
+Council is a **downstream** agent in the dependency graph. Before triggering council:
+
+1. **Check if @strategist has run** on this topic. If yes, council briefing MUST include strategist's output.
+2. **Check if @explorer has run** on this codebase. If yes, council briefing MUST include explorer's map.
+3. **If neither has run**, council may proceed from first principles — but note this as a limitation in the briefing.
+
+**Never trigger council simultaneously with strategist or explorer.** They are predecessors, not peers.
+
 ### The 3 Councillors
 
 | Agent | Default model behavior | Role |
@@ -395,7 +509,9 @@ When a request requires multiple agents sequentially (e.g., "audit then brainsto
 ### Execution Flow
 
 **Step 1: Build the Council Briefing**
-Before spawning councillors, gather all relevant context into a structured briefing:
+Before spawning councillors, gather all relevant context into a structured briefing.
+
+**CRITICAL — Check Dependency Graph**: Council is typically a successor to @strategist. If @strategist has already run on this topic, their output MUST be included in the council briefing. Do NOT convene council with raw user input alone if strategist analysis exists.
 
 ```
 ## COUNCIL BRIEFING
@@ -411,6 +527,14 @@ Before spawning councillors, gather all relevant context into a structured brief
 
 ### CONSTRAINTS
 [Project constraints, tech stack, known limitations]
+
+### STRATEGIST ANALYSIS (if available — MANDATORY inclusion)
+[If @strategist already analyzed this topic, include their full output:
+ - Proposed approaches
+ - Trade-off analysis
+ - Recommendation and confidence
+ - Open questions or gaps
+If strategist has NOT run, state: "No strategist analysis available. Council reasoning from first principles."]
 ```
 
 **Step 2: Fan Out (3 parallel task calls)**
