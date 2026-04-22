@@ -1,8 +1,8 @@
 {
   "$schema": "https://opencode.ai/config.json",
-  "_comment": "Minimal config — orchestrator + generalist only. Agents inherit the active session model automatically.",
+  "_comment": "Minimal config — orchestrator + generalist only. Agents inherit the active orchestrator/session model.",
   "version": "1.0.0",
-  "model": "opencode/kimi-k2.6",
+  "model": "opencode-go/qwen3.6-plus",
   "agent": {
     "orchestrator": {
       "mode": "primary",

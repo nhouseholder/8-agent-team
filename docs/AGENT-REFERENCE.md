@@ -12,7 +12,7 @@ Detailed specifications for each agent in the orchestration system.
 ### Role
 AI coding orchestrator that routes tasks to specialists for optimal quality, speed, cost, and reliability.
 
-### Decision Tree (19 steps)
+### Decision Tree (22 steps)
 1. Multi-agent chain detection
 2. Context/session management → @generalist
 3. Speed-critical/token-sensitive → @generalist
@@ -24,14 +24,19 @@ AI coding orchestrator that routes tasks to specialists for optimal quality, spe
 9. External research/docs → @researcher
 10. UI/UX polish → @designer
 11. Debugging/audit/review → @auditor
-12. Multi-model consensus → @council
-13. Trivial (<20 lines, one file) → Do it yourself
+12. Multi-model consensus → Council Fan-Out Protocol
+13. Cosmetic edit or trivial lookup → Do it yourself
 14. Writing tests for existing code → @auditor
 15. Refactoring entire module → @strategist → @generalist
 16. New project from scratch → @strategist (SPRINT)
 17. Framework migration → @researcher → @strategist → @auditor
 18. API documentation → @generalist
 19. Performance profiling → @auditor → @generalist
+20. "Improve this" or "refine this" → @auditor (REFINE MODE)
+21. Session end → compactor skill, then debrief if requested
+22. Idea/proposal/"should we" → strategist or council, depending on stakes
+
+**Idea routing:** strategist is the default for feasibility and planning; reserve council for high-stakes trade-offs with multiple viable paths.
 
 ### Chain Protocol
 - Detects sequential language in user requests
@@ -123,11 +128,11 @@ Unified strategic advisor, planner, and "what's next" engine. Combines architect
 ### Constraints
 - READ-ONLY: Advise, plan, and recommend — don't implement
 - Never start coding during spec/planning phases
-- If user asks to code, redirect to @auditor or @generalist
+- If user asks to code, redirect to @generalist for concrete implementation or @auditor for debugging/review/test-focused work
 - Always propose 2-3 approaches for non-trivial decisions
 
 ### Escalation
-- If task requires implementation → redirect to @auditor or @generalist
+- If task requires implementation → redirect to @generalist by default, or @auditor when the real need is debugging, review, or bounded test/fix work
 - If uncertain about requirements → ask clarifying questions before planning
 
 ---
@@ -217,7 +222,7 @@ Frontend UI/UX specialist for intentional, polished experiences.
 **Model:** opencode-go/qwen3.6-plus
 
 ### Role
-Dual-mode agent. READ MODE for auditing/reviewing/debugging. FIX MODE for implementing changes. REFINE MODE for pattern-based improvements (absorbed from former refiner agent).
+Triple-mode agent. READ MODE for auditing/reviewing/debugging. FIX MODE for implementing changes. REFINE MODE for pattern-based improvements (absorbed from former refiner agent).
 
 ### READ MODE
 - Code review with correctness, performance, maintainability checks
@@ -263,53 +268,38 @@ Dual-mode agent. READ MODE for auditing/reviewing/debugging. FIX MODE for implem
 
 ## @council
 
-**Mode:** all  
-**Model:** opencode-go/qwen3.6-plus
+**Mode:** subagent  
+**Model:** inherits the invoking orchestrator/session model by default
 
 ### Role
-Multi-LLM orchestration system that runs consensus and structured debate across multiple models.
+Protocol reference for structured council arbitration. The orchestrator fans out to 3 separate councillor agents, then synthesizes the verdict. Explicit per-agent model overrides are optional if you want multi-model council.
 
-### Mode Detection
-| Signal | Mode |
-|---|---|
-| "What's the best approach?", debugging failed 3+ times | **CONSENSUS MODE** |
-| "Should we...", "what if...", proposing an idea | **DEBATE MODE** |
+### How It Works
+1. The orchestrator detects a high-stakes decision or repeated failed debugging.
+2. The orchestrator builds one shared briefing with the question, constraints, context, and memory.
+3. It fans out in parallel to `@council-advocate-for`, `@council-advocate-against`, and `@council-judge`.
+4. It synthesizes the final verdict.
 
-### CONSENSUS MODE
-1. Call `council_session` with the user's prompt
-2. Receive synthesized response from council master
-3. Present result verbatim — do not re-summarize
-
-### DEBATE MODE — Structured Idea Evaluation
-When a user proposes an idea, run a structured debate:
-
-1. **FRAME** — Restate the proposal, problem it solves, stakes
-2. **ADVOCATE FOR** — Strongest case FOR (benefits, risk mitigation, when it shines)
-3. **ADVOCATE AGAINST** — Strongest case AGAINST (costs, complexity, alternatives, when it fails)
-4. **JUDGE** — Evaluate both sides, surface assumptions, identify strongest arguments
-5. **VERDICT** — PROCEED / PROCEED WITH CAVEATS / REJECT / NEEDS MORE DATA
-
-### Debate Rules
-- Steel-man both sides — never present weak arguments
-- Surface hidden costs — complexity, maintenance, opportunity cost
-- Identify assumptions — what must be true for this to work?
-- No fence-sitting — JUDGE must take a position
-- Actionable verdict — never "it depends" without specifics
+### Verdicts
+- `PROCEED`
+- `PROCEED WITH CAVEATS`
+- `REJECT`
+- `NEEDS MORE DATA`
 
 ### When to Use
-- User proposes an idea: "Should we add X?", "What if we use Y?"
 - High-stakes architectural choices where wrong choice is costly
 - Debugging has failed 3+ times
-- @strategist proposes 2-3 approaches and you need to pick the best
+- Multiple credible approaches remain after strategist-level analysis and an additional arbitration pass is worth the latency
 
 ### When NOT to Use
 - Routine decisions (use @strategist LITE mode)
-- Simple implementation tasks (use @generalist or @auditor)
+- Simple implementation tasks (use @generalist)
+- Narrow debugging or code review work (use @auditor)
 - When speed matters more than confidence
 
 ### Output Format
 ```
-<summary>Debate on: [proposal summary]</summary>
+<summary>Council evaluation of: [proposal summary]</summary>
 <for>Strongest arguments FOR</for>
 <against>Strongest arguments AGAINST</against>
 <judge>Evaluation, assumptions, strongest arguments</judge>
@@ -317,10 +307,10 @@ When a user proposes an idea, run a structured debate:
 <next>Recommended action</next>
 ```
 
-### Escalation
-- If out of depth after 2 attempts → recommend the right specialist
-- If task requires capabilities you don't have → say so explicitly
-- Never guess or hallucinate — admit uncertainty
+### Fallback
+- If one councillor fails, continue with the remaining two and note the failure
+- If 2+ councillors fail, fall back to @strategist
+- Default config requires no special provider; councillors inherit the active model automatically
 
 ---
 
@@ -342,18 +332,21 @@ Focused plan executor for medium-complexity tasks. Executes structured plans wit
 | **Debugging** | Light | "Why is this failing?" |
 | **Implementation** | Full | "Update these 5 config files" |
 | **Architecture** | Light | "Should we use X or Y here?" |
-| **Compaction** | Full | "Compact this session", "Save state" |
-| **Summarization** | Full | "What did we do?", "Progress report", "Simplify changes" |
 
 ### Decision Protocol
 1. Is this a specialist job? → Recommend the right agent
 2. Can I handle it? → Execute directly
 3. Am I out of my depth? → Stop and recommend escalation
 
-### Context Compaction
-- Preserves: decisions with rationale, file paths, open questions, patterns
-- Discards: exploration dead-ends, verbose errors, intermediate steps
-- Saves to: `thoughts/ledgers/CONTINUITY_YYYY-MM-DD_HHMM.md`
+### Execution Rules
+- Backup before non-trivial edits
+- Verify after each step or batch of changes
+- Revert on failed verification instead of pushing through
+- Stop when scope becomes architectural or ambiguous
+
+### Pre-Compaction Checkpoint
+- Save current task, decisions, changed files, and next action before any compaction
+- Rehydrate from the checkpoint before resuming execution
 
 ### Boundary Rules (vs @auditor)
 - **@generalist:** Know WHAT to change → medium tasks, configs, docs, refactors
@@ -370,6 +363,10 @@ Focused plan executor for medium-complexity tasks. Executes structured plans wit
 - Tests passed: [yes/no/skip reason]
 - LSP diagnostics: [clean/errors found/skip reason]
 </verification>
+
+<next>
+Recommended next step or "complete"
+</next>
 ```
 
 ### Escalation Triggers
@@ -378,7 +375,3 @@ Focused plan executor for medium-complexity tasks. Executes structured plans wit
 - UI needs visual polish beyond "functional"
 - Decision has long-term architectural consequences
 - Need to understand an unfamiliar library
-
----
-
-## @generalist (Deploy)

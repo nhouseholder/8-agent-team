@@ -42,10 +42,10 @@ git log --oneline -5
 pwd
 ```
 
-Save a compact state snapshot to `thoughts/ledgers/CONTINUITY_$(date +%Y-%m-%d_%H%M).md`:
+Update `~/.claude/projects/<project>/memory/pre_compact_checkpoint.md`:
 
 ```markdown
-# Continuity Ledger — [Project] — [Date Time]
+# Pre-Compact Checkpoint — [Project] — [Date Time]
 
 ## Current Task
 [What we're working on right now]
@@ -157,17 +157,17 @@ When the decision table above says HANDOFF:
 
 ### On Session Start:
 ```bash
-# Find most recent ledger for this project
-ls -t thoughts/ledgers/ 2>/dev/null | head -3
+# Read the current session checkpoint if it exists
+cat ~/.claude/projects/<project>/memory/pre_compact_checkpoint.md 2>/dev/null
 # Read project CLAUDE.md, AGENTS.md
 # Read recent handoffs
 git log --oneline -10
 ```
 
 ### On Session End:
-1. Update continuity ledger with current state
+1. Update `~/.claude/projects/<project>/memory/pre_compact_checkpoint.md` with current state
 2. Commit ledger changes
-3. Output: "Ledger saved. Next session will pick up from: [path]"
+3. Output: "Checkpoint saved. Next session will pick up from: [path]"
 
 ## Memory Persistence
 
@@ -180,14 +180,14 @@ Memory saves are batched with compaction events — not saved after every task.
 | **Before compaction** | Write checkpoint file to disk + `engram_mem_save` key findings + `brain-router_brain_save` critical facts |
 | **Session end** | `engram_mem_session_summary` (comprehensive) + final `brain-router_brain_save` |
 | **Major decision mid-session** | `engram_mem_save` + `brain-router_brain_save` only — no disk file needed |
-| **NEVER** | Do NOT write to mempalace during save rhythm. It's read-only. Checkpoint/ledger files handle verbatim storage. |
+| **NEVER** | Do NOT write to mempalace during save rhythm. It's read-only. The checkpoint file handles the human-readable verbatim fallback. |
 
 ### Project-Level Memory (disk files)
 Each project maintains:
-- `thoughts/ledgers/` — session continuity files
-- `handoffs/` — end-of-session summaries
-- `docs/superpowers/specs/` — design decisions
-- `docs/superpowers/plans/` — implementation plans
+- `~/.claude/projects/<project>/memory/pre_compact_checkpoint.md` — latest session continuity file
+- `~/.claude/projects/<project>/memory/handoff.md` — end-of-session summary when compaction is no longer appropriate
+- `docs/specs/` — design decisions
+- `docs/plans/` — implementation plans
 
 ### Global Memory
 - `~/.claude/anti-patterns.md` — recurring mistakes across all projects
@@ -200,8 +200,8 @@ Each project maintains:
 3. **Preserve open questions** — unresolved decisions must survive
 4. **Discard exploration dead-ends** — what we tried and rejected
 5. **Discard verbose outputs** — keep conclusions, not intermediate steps
-6. **Ledger before compact** — always save state before context shrinks
-7. **Re-inject after compact** — restore critical context from ledger
+6. **Checkpoint before compact** — always save state before context shrinks
+7. **Re-inject after compact** — restore critical context from the checkpoint file
 8. **Handoff over extended context, always** — never fight compression with rate-limited extended context
 9. **Track compaction count** — mentally count compactions; at 2+, switch to handoff
 10. **Pre-agent compaction** — before spawning large agents on heavy context, compact first

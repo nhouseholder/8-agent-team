@@ -1,54 +1,22 @@
-# Model Tier Mapping
-# Map tiers to your preferred providers. Change this once, all agents update.
+# Model inheritance policy
 #
-# Tiers:
-#   smart    — Complex reasoning, architecture, debugging
-#   fast     — Quick tasks, research, docs, compaction
-#   creative — UI/UX, design, visual work
-#   reasoning — Deep analysis, multi-step logic
+# Default runtime behavior:
+# - Set the top-level `model` in opencode.json, or choose one at runtime in OpenCode.
+# - Primary agents inherit the active session/default model when agent.model is omitted.
+# - Subagents inherit the invoking primary agent's model when agent.model is omitted.
 #
-# Council requires 3 DIFFERENT providers for true multi-LLM consensus.
+# The repo default intentionally does not ship hardcoded per-agent model IDs.
+# If you want true multi-model council, add explicit valid overrides yourself.
 
-tiers:
-  smart: "anthropic/claude-sonnet-4-6"
-  fast: "anthropic/claude-haiku-4-5-20251022"
-  creative: "anthropic/claude-sonnet-4-6"
-  reasoning: "anthropic/claude-opus-4-6-20250514"
+default_behavior:
+  top_level_model: "set in opencode.json or choose at runtime"
+  primary_agents: "inherit the active session/default model when agent.model is omitted"
+  subagents: "inherit the invoking primary agent model when agent.model is omitted"
 
-# Council models — 3 different reasoning models via OpenRouter (free)
-# Each from a different training distribution for meaningful consensus
-council:
-  advocate-for: "openrouter/openai/gpt-oss-120b:free"
-  advocate-against: "openrouter/xiaomi/mimo-v2-flash:free"
-  judge: "openrouter/qwen/qwen3-235b-a22b-thinking-2507:free"
+optional_manual_overrides:
+  council:
+    advocate-for: "<provider>/<model-a>"
+    advocate-against: "<provider>/<model-b>"
+    judge: "<provider>/<model-c>"
 
-# Backup council models — swap in if any primary becomes unavailable
-council-backup:
-  - model: "openrouter/deepseek/deepseek-r1:free"
-    role: "RL-trained reasoning specialist. AIME 87.5%, GPQA 81.0%. Slower but thorough."
-  - model: "openrouter/meta-llama/llama-4-maverick:free"
-    role: "General-purpose. 1M context. Strong multilingual. No native CoT."
-  - model: "openrouter/google/gemma-3-27b-it:free"
-    role: "Google's distribution. Single GPU. Multimodal. Weaker reasoning."
-
-# Alternative: OpenCode + Qwen (single provider — council will be self-talk)
-# tiers:
-#   smart: "opencode-go/qwen3.6-plus"
-#   fast: "opencode-go/qwen3.6-plus"
-#   creative: "opencode-go/qwen3.6-plus"
-#   reasoning: "opencode-go/qwen3.6-plus"
-# council:
-#   advocate-for: "opencode-go/qwen3.6-plus"
-#   advocate-against: "opencode-go/qwen3.6-plus"
-#   judge: "opencode-go/qwen3.6-plus"
-
-# Alternative: Claude Code (single provider)
-# tiers:
-#   smart: "anthropic/claude-sonnet-4-6"
-#   fast: "anthropic/claude-haiku-4-5-20251022"
-#   creative: "anthropic/claude-sonnet-4-6"
-#   reasoning: "anthropic/claude-opus-4-6-20250514"
-# council:
-#   advocate-for: "anthropic/claude-sonnet-4-6"
-#   advocate-against: "anthropic/claude-opus-4-6-20250514"
-#   judge: "openai/gpt-4o"
+# Use `opencode models [provider]` to list valid model IDs before adding overrides.

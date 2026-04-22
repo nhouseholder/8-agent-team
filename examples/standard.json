@@ -1,36 +1,60 @@
 {
   "$schema": "https://opencode.ai/config.json",
-  "_comment": "Standard config — full 8-agent core system. Recommended default for most users.",
-  "version": "1.6.0",
-  "model": "opencode/kimi-k2.6",
+  "_comment": "Standard config — current 8-agent runtime. Agents inherit the active orchestrator/session model unless you add explicit overrides.",
+  "version": "1.7.0",
+  "model": "opencode-go/qwen3.6-plus",
   "agent": {
     "orchestrator": {
       "mode": "primary",
-      "prompt_file": "agents/orchestrator.md"
+      "prompt_file": "agents/generated/orchestrator.md"
+    },
+    "explorer": {
+      "mode": "all",
+      "prompt_file": "agents/generated/explorer.md"
     },
     "strategist": {
       "mode": "all",
-      "prompt_file": "agents/strategist.md"
+      "prompt_file": "agents/generated/strategist.md"
     },
     "researcher": {
       "mode": "all",
-      "prompt_file": "agents/researcher.md"
+      "prompt_file": "agents/generated/researcher.md"
     },
     "designer": {
       "mode": "all",
-      "prompt_file": "agents/designer.md"
+      "prompt_file": "agents/generated/designer.md"
     },
     "auditor": {
       "mode": "all",
-      "prompt_file": "agents/auditor.md"
+      "prompt_file": "agents/generated/auditor.md"
     },
     "council": {
-      "mode": "all",
-      "prompt_file": "agents/council.md"
+      "mode": "subagent",
+      "prompt_file": "agents/generated/council.md",
+      "note": "Protocol reference only. Councillors inherit the active orchestrator/session model unless you add explicit agent-level overrides."
+    },
+    "council-advocate-for": {
+      "mode": "subagent",
+      "prompt_file": "agents/generated/council-advocate-for.md"
+    },
+    "council-advocate-against": {
+      "mode": "subagent",
+      "prompt_file": "agents/generated/council-advocate-against.md"
+    },
+    "council-judge": {
+      "mode": "subagent",
+      "prompt_file": "agents/generated/council-judge.md"
     },
     "generalist": {
       "mode": "all",
-      "prompt_file": "agents/generalist.md"
+      "prompt_file": "agents/generated/generalist.md"
+    }
+  },
+  "provider": {
+    "openrouter": {
+      "options": {
+        "apiKey": "YOUR_OPENROUTER_KEY"
+      }
     }
   }
 }

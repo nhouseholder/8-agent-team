@@ -1,7 +1,11 @@
 {
   "$schema": "https://opencode.ai/config.json",
-  "_comment": "OpenRouter-ready config — provider configured for optional OpenRouter use. Agents inherit the active session model; council uses OpenRouter for multi-model consensus only when explicitly configured.",
-  "model": "opencode/kimi-k2.6",
+  "_comment": "OpenRouter-ready config — provider configured for optional OpenRouter use, but agents still inherit the active orchestrator/session model unless you add explicit overrides.",
+  "model": "opencode-go/qwen3.6-plus",
+  "plugin": [
+    "oh-my-opencode-slim",
+    "micode"
+  ],
   "mcp": {
     "brain-router": {
       "type": "local",
@@ -57,21 +61,12 @@
     },
     "council": {
       "mode": "all",
-      "model": "openrouter/auto",
       "prompt_file": "agents/council.md",
-      "note": "Council uses OpenRouter for true multi-LLM consensus with 3 different reasoning models. See agents/council.md for roster and backup models."
+      "note": "Provider is configured for OpenRouter, but councillors still inherit the active orchestrator/session model unless you add explicit agent-level overrides."
     },
     "generalist": {
       "mode": "all",
       "prompt_file": "agents/generalist.md"
-    }
-  },
-  "permission": {
-    "read": {
-      "~/.config/opencode/get-shit-done/*": "allow"
-    },
-    "external_directory": {
-      "~/.config/opencode/get-shit-done/*": "allow"
     }
   },
   "provider": {
@@ -80,14 +75,5 @@
         "apiKey": "YOUR_OPENROUTER_KEY"
       }
     }
-  },
-  "models": {
-    "default": "opencode/kimi-k2.6",
-    "fast": "opencode/kimi-k2.6",
-    "smart": "opencode/kimi-k2.6",
-    "creative": "opencode/kimi-k2.6",
-    "council-advocate-for": "openrouter/openai/gpt-oss-120b:free",
-    "council-advocate-against": "openrouter/xiaomi/mimo-v2-flash:free",
-    "council-judge": "openrouter/qwen/qwen3-235b-a22b-thinking-2507:free"
   }
 }

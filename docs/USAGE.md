@@ -4,7 +4,7 @@
 
 ### @orchestrator (Router)
 
-The orchestrator is the entry point for all requests. It classifies every message using a 19-step decision tree and dispatches to the right agent.
+The orchestrator is the entry point for all requests. It classifies every message using a 22-step decision tree and dispatches to the right agent.
 
 **You don't call it directly** — it's the default agent. Just talk to it naturally.
 
@@ -82,7 +82,7 @@ Frontend UI/UX specialist for intentional, polished experiences.
 
 ### @auditor (Debugging & Implementation)
 
-Dual-mode agent: READ MODE for auditing/reviewing, FIX MODE for implementing changes.
+Triple-mode agent: READ MODE for auditing/reviewing, FIX MODE for implementing changes, REFINE MODE for conservative pattern-based improvements.
 
 **READ MODE:**
 - Code review with correctness, performance, maintainability checks
@@ -102,19 +102,26 @@ Dual-mode agent: READ MODE for auditing/reviewing, FIX MODE for implementing cha
 
 **Output:** Summary of changes, verification status, and next steps.
 
-### @council (Multi-LLM Consensus)
+### @council (Structured Arbitration)
 
-Runs consensus across multiple models for high-stakes decisions.
+Runs a 3-role arbitration protocol for high-stakes decisions. The orchestrator fans out to 3 separate councillor agents and synthesizes the verdict. By default those councillors inherit the active orchestrator/session model.
 
 **When to use:**
 - Critical architectural choices where wrong choice is costly
 - Debugging has failed 3+ times
-- Need diverse perspectives on ambiguous problems
+- Need independent perspectives on ambiguous problems
 
 **When NOT to use:**
 - Routine decisions (use @strategist LITE)
 - Simple implementation tasks
 - When speed matters more than confidence
+
+**How it works:**
+1. Orchestrator builds one shared briefing with context, constraints, and memory.
+2. It fans out to `@council-advocate-for`, `@council-advocate-against`, and `@council-judge`.
+3. It returns a synthesized verdict: `PROCEED`, `PROCEED WITH CAVEATS`, `REJECT`, or `NEEDS MORE DATA`.
+
+If you manually add valid agent-level `model` overrides for the three councillors, the same protocol becomes true multi-model council.
 
 **Example prompts:**
 - "Should we use microservices or monolith for this project?"
@@ -124,17 +131,18 @@ Runs consensus across multiple models for high-stakes decisions.
 
 ### @generalist (Medium Tasks)
 
-Swiss Army knife for tasks too involved for a quick edit but not warranting a specialist.
+Focused plan executor for medium-complexity tasks. It follows plans with backup, verification, and revert checkpoints, or handles bounded multi-file work autonomously.
 
 **Capabilities:**
-- Light exploration, research, design, debugging
-- Full implementation for clear-scope tasks
-- Context compaction and session continuity
+- Structured plan execution
+- Autonomous medium-complexity implementation
+- Multi-file config, docs, and tooling updates
+- Pre-compaction checkpointing when session state must be preserved
 
 **Example prompts:**
 - "Update these 5 config files for the new environment"
 - "Write a README for this project"
-- "Compact the current session context"
+- "Execute this implementation plan"
 - "Add error handling to these API endpoints"
 
 **Output:** Summary of changes, verification status, and next steps.
@@ -155,28 +163,6 @@ Recommends highest-impact next actions scoped to the current project.
 - "Review the handoff from last session"
 
 **Output:** Prioritized recommendations with evidence from git state, handoffs, and memory.
-
-### @generalist (Deploy)
-
-> **Note:** Shipper was merged into @generalist in v1.3.0.
-
-Sync, bump, commit, push, deploy, verify, and handoff. See @generalist section above.
-
-### @generalist (Summaries)
-
-Produces concise, factual summaries of work done.
-
-**Modes:**
-- **SESSION SUMMARY**: "What did we do?" — bullets with files changed → outcome
-- **PROGRESS TRACKER**: "Progress report" — N/M tasks, percentage, ETA
-- **CODE SIMPLIFICATION**: "Simplify changes" — review diff for simpler alternatives
-
-**Example prompts:**
-- "Summarize what we did today"
-- "Progress report"
-- "Can these changes be simplified?"
-
-**Output:** Factual summary with git data, current state, and next step.
 
 ## Multi-Agent Chains
 
@@ -204,36 +190,37 @@ The orchestrator detects sequential language and chains agents automatically.
 **Chain rules:**
 - Max depth: 4 agents
 - Recovery: retry once → escalate → pause for user input
-- State saved to ledger before pausing
+- State saved to the session checkpoint before pausing
 - Resumes from last completed step
 
-## Configuring Council for True Multi-LLM Consensus
+## Optional: Manual Council Model Overrides
 
-Council requires 3 **different** models. With the same model, it's self-talk.
+The shipped config intentionally does **not** hardcode council model IDs. By default, councillors inherit the active orchestrator/session model, which keeps the repo portable and valid.
 
-### Option A: OpenRouter (Recommended — Free, 3 Different Reasoning Models)
+If you want true multi-model council, add valid agent-level overrides yourself:
 
-One free API key gives access to 3 reasoning models with native chain-of-thought.
+```json
+{
+	"agent": {
+		"council-advocate-for": {
+			"mode": "subagent",
+			"model": "<provider>/<model-a>",
+			"prompt_file": "agents/generated/council-advocate-for.md"
+		},
+		"council-advocate-against": {
+			"mode": "subagent",
+			"model": "<provider>/<model-b>",
+			"prompt_file": "agents/generated/council-advocate-against.md"
+		},
+		"council-judge": {
+			"mode": "subagent",
+			"model": "<provider>/<model-c>",
+			"prompt_file": "agents/generated/council-judge.md"
+		}
+	}
+}
+```
 
-**The 3 Council Models:**
+Use `opencode models [provider]` to list valid model IDs before adding overrides.
 
-| Role | Model | Why |
-|---|---|---|
-| **Advocate For** | `openai/gpt-oss-120b:free` | OpenAI's distribution. Highest MMLU-Pro (90.0%). Adjustable reasoning effort. |
-| **Advocate Against** | `xiaomi/mimo-v2-flash:free` | Xiaomi's distribution. Highest AIME 2025 (94.1%). Best SWE-Bench (73.4%). |
-| **Judge** | `qwen/qwen3-235b-a22b-thinking-2507:free` | Alibaba's distribution. Best HMMT (83.9%), LiveCodeBench v6 (74.1%). |
-
-**Setup (2 minutes):**
-
-1. Get a free OpenRouter API key: https://openrouter.ai/keys (no credit card)
-2. Copy `examples/openrouter-council.json` to your OpenCode config directory as `opencode.json`
-3. Replace `YOUR_OPENROUTER_KEY` with your actual key
-4. Start a session — council now uses 3 different reasoning models
-
-**Rate limits:** ~200 requests/day per model on the free tier.
-
-**Backup models** (swap in if any primary is unavailable): DeepSeek R1, Llama 4 Maverick, Gemma 3 27B. See `agents/council.md` for full backup roster.
-
-### Option B: Single Provider (Default — Works Out of the Box)
-
-Council runs in DEBATE MODE with a single model — still valuable for structured idea evaluation. Use `examples/standard.json` or `examples/minimal.json`.
+If you plan to use OpenRouter models, copy `examples/openrouter-council.json`, replace `YOUR_OPENROUTER_KEY`, and then add your own valid councillor overrides.

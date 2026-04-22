@@ -1,8 +1,8 @@
 {
   "$schema": "https://opencode.ai/config.json",
-  "_comment": "Enterprise config — full 8-agent system + memory + health monitoring + validation. All features enabled.",
-  "version": "1.6.0",
-  "model": "opencode/kimi-k2.6",
+  "_comment": "Enterprise config — full 8-agent system + memory + health monitoring + validation. Agents inherit the active orchestrator/session model.",
+  "version": "1.7.0",
+  "model": "opencode-go/qwen3.6-plus",
   "mcp": {
     "brain-router": {
       "type": "local",

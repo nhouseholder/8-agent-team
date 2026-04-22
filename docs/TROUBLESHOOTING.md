@@ -26,7 +26,7 @@
 - Chain exceeded max depth (4)
 
 **Fix:**
-1. Check the ledger for chain state: `thoughts/ledgers/CONTINUITY_*.md`
+1. Check the session checkpoint file for chain state: `~/.claude/projects/<project>/memory/pre_compact_checkpoint.md`
 2. Resume manually: "Continue the chain from [last completed step]"
 3. If agent failed: try with clearer instructions or route to different agent
 
@@ -82,12 +82,12 @@
 **Symptom:** @council gives surface-level consensus instead of deep analysis.
 
 **Causes:**
-- Prompt too vague for council_session tool
-- Preset not specified (defaults to generic)
+- The council briefing lacks concrete constraints, stakes, or context
+- Council fell back to strategist-style analysis because distinct councillor models were unavailable
 
 **Fix:**
 1. Provide specific context: "Given [specific constraints], should we use X or Y?"
-2. Specify a preset if available: `council_session(prompt="...", preset="technical")`
+2. Verify `agent.council-*` points at 3 distinct models if you expect true council fan-out
 3. Only use council for genuinely high-stakes decisions
 
 ### Deploy Fails
