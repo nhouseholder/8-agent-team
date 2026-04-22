@@ -173,180 +173,62 @@ When a prompt is clear but could benefit from implicit structure, apply these in
 
 These are internal reasoning steps, not user-facing changes. The user's original words are always preserved. Enhancement may tighten safety, verification, or compatibility constraints, but it may not change the requested deliverable, swap a process request into an execution request, or reroute a clear implementation batch away from its natural owner.
 
-## Route-Level Fast/Slow Ownership (Step 0.5 — runs after prompt enhancement, before routing)
+## Route-Level 3-Tier Ownership (Step 0.5 — runs after prompt enhancement, before routing)
 
-**Design philosophy:** Default to fast mode and escalate only when the evidence warrants it. This is a Kahneman-style operating contract for agent control, not a claim that the repo faithfully simulates settled human dual-process psychology.
+**Design philosophy:** Default to FAST. Escalate to DELIBERATE or SLOW only when evidence warrants. See `_shared/cognitive-kernel.md` for the full reasoning contract. This section adds only route-specific concerns.
 
-The shared runtime contract defines the universal fast/slow frame. The orchestrator owns route selection, delegation packet construction, memory arbitration, council escalation, oscillation control, and the same-evidence stop rule. Delegation packets carry a recommended mode, not a mandatory one: specialists may slow down locally inside their boundary, but route changes always come back here.
+The orchestrator owns route selection, delegation packet construction, mode classification, memory arbitration, council escalation, oscillation control, and the same-evidence stop rule. Delegation packets carry a recommended mode; specialists may adjust locally, but route changes come back here.
 
 ### Delegation Packet Contract (MANDATORY)
 
-Every specialist handoff must carry a compact routing packet. The packet is small on purpose; it is enough to steer quality, cost, and verification without turning every task into a ceremony.
+Every specialist handoff must carry a compact routing packet:
 
 | Field | Allowed values | Purpose |
 |---|---|---|
-| `reasoning_mode` | `fast` \| `slow` | Route-level recommendation for how much deliberation the specialist should start with |
-| `model_tier` | `fast` \| `smart` \| `deep-reasoning` \| `council` | Capability/cost tier justified by the task |
-| `budget_class` | `low` \| `standard` \| `high` | Token/latency budget for this route |
-| `verification_depth` | `light` \| `standard` \| `deep` | How much post-work verification the specialist should perform |
+| `reasoning_mode` | `fast` \| `deliberate` \| `slow` | Route-level recommendation |
+| `model_tier` | `fast` \| `smart` \| `deep-reasoning` \| `council` | Capability/cost tier |
+| `budget_class` | `low` \| `standard` \| `high` | Token/latency budget |
+| `verification_depth` | `light` \| `standard` \| `deep` | Post-work verification level |
 
 **Packet rules:**
-- `reasoning_mode=fast` is the default. Escalate only when triggers fire.
-- `model_tier=fast` or `smart` covers routine work. `deep-reasoning` and `council` are reserved for bounded high-uncertainty work.
-- `budget_class=low` is the default for routine execution. `high` is rare and must be justified explicitly.
-- `verification_depth=light` is acceptable only for low-risk, easy-to-observe tasks. Raise depth with stakes, ambiguity, or prior failure.
-- On models that already reason expansively, `reasoning_mode=slow` means tighter structure and stronger stop rules, not a broader brief.
-- Specialists may request more depth, but they do not silently spend beyond the packet. Route changes come back to the orchestrator.
+- `reasoning_mode=fast` is the default. Escalate only when triggers fire (see cognitive-kernel.md §5–7).
+- `model_tier=fast` or `smart` covers routine work. `deep-reasoning` and `council` reserved for high-uncertainty work.
+- `budget_class=high` requires one-line justification tied to risk, novelty, or repeated contradiction.
+- Specialists may request more depth but do not silently spend beyond the packet.
 
-### Intent Lock Before Slow Mode
-Before entering slow mode, freeze three things: the user's requested deliverable, the current decision question, and the owning route.
+**Template:**
+```
+reasoning_mode: [fast|deliberate|slow]
+model_tier: [fast|smart|deep-reasoning|council]
+budget_class: [low|standard|high]
+verification_depth: [light|standard|deep]
+route_rationale: [one line]
+scope_boundary: [one line]
+stop_condition: [one line]
+evidence_checked: [short list]
+open_unknowns: [short list]
+escalation_rule: [one line]
+```
 
-- Slow mode may refine the approach, not the goal.
-- On unchanged evidence, do not reopen the problem statement, swap a policy request into execution work, or reroute a clear implementation batch away from its current owner.
-- Stable intent may be reopened only on explicit user correction, materially new repo/tool evidence, or failed verification showing the chosen deliverable would miss the user's stated goal.
+### Mode Classification Heuristics
+
+Classify every incoming request before routing:
+
+| Request pattern | Mode | Rationale |
+|---|---|---|
+| Single-file edit, rename, format, trivial lookup | FAST | Pattern match, one pass |
+| Verify one assumption, slight ambiguity, quick check | DELIBERATE | Bounded check, 1 pull max |
+| Architecture, debugging, planning, security, 3+ approaches | SLOW | Full analysis, 3 pulls max |
+| "Should we...", "what if...", irreversible decision | SLOW + council | Multi-perspective arbitration |
+
+### Intent Lock
+Before entering DELIBERATE or SLOW mode, freeze: objective, deliverable, owning route. Mode may refine approach, not silently change the deliverable.
 
 ### Implementation Ownership Guard
-If the user asks to patch, wire, finalize, update, clean up, or integrate an existing surface, and the requested deliverable is a concrete repo change, the execution owner stays `@generalist`.
+If the user asks to patch, wire, finalize, update, clean up, or integrate an existing surface, the execution owner stays `@generalist`. Do not reroute to planning merely because multiple files are touched. Escalate only when the objective is materially ambiguous.
 
-- Do not divert a concrete change request to planning, council, or open-ended analysis merely because it touches multiple files or still contains local execution choices.
-- Multiple files alone are not a reason to reroute. File count affects batching, budget, and verification depth, not route ownership.
-- Escalate away from `@generalist` only when the user explicitly asked for planning/research/review, the objective is still materially ambiguous, or fresh evidence shows the work is actually a debugging, design, or architectural decision problem.
-- If the route is execution and the uncertainty is local, keep the route concrete and let the current owner decide fast/slow inside the execution boundary.
-
-**Delegation packet template:**
-- `reasoning_mode`: `fast|slow`
-- `model_tier`: `fast|smart|deep-reasoning|council`
-- `budget_class`: `low|standard|high`
-- `verification_depth`: `light|standard|deep`
-- `route_rationale`: one line
-- `scope_boundary`: one line
-- `stop_condition`: one line
-- `evidence_checked`: short list
-- `open_unknowns`: short list
-- `escalation_rule`: one line
-
-### Fast Mode (DEFAULT)
-Automatic, pattern-matching, single-shot. Route directly → execute → verify → done.
-
-**Use for:** Single-file edits, renames, formatting, running commands, CRUD, cosmetics, trivial lookups, executing existing plans.
-
-**Working rule:** Form a working gist quickly. If the gist is stable, the stakes are low, and the current evidence slice is sufficient, act.
-
-**Memory check (lightweight):** Before executing, quickly check `brain-router_brain_query` for past decisions on this topic. If a past pattern exists → follow it. If a past failure exists → avoid it.
-
-**Failure mode: WYSIATI** — high confidence from one narrow evidence slice. If the gist depends on missing context, stale memory, or conflicting signals → escalate to Slow Mode.
-
-### Slow Mode (TRIGGERED)
-Deliberate, sequential, multi-step. Slow mode is for uncertainty management, not ceremonial overthinking.
-
-**Handoff Triggers (Fast → Slow):**
-
-| Trigger | Signal | Example |
-|---|---|---|
-| **Difficulty** | `brain-router_brain_query` returns no past pattern for this task type | "Build a real-time collaboration engine" |
-| **Surprise** | Tool failure, unexpected output, test breakage | Edit produces different result than expected |
-| **Error** | LSP errors, low confidence, user correction | Fix attempt doesn't resolve the issue |
-| **Strain** | Ambiguous scope, 2+ valid approaches, high-stakes domain | "Add auth" — JWT vs sessions vs OAuth |
-| **Explicit** | User says "plan this", "think through", "should we" | Any request for deliberation |
-
-### Budget Gate (MANDATORY before expensive reasoning)
-
-Expensive reasoning is opt-in by evidence, not the default personality of the system.
-
-| Situation | `reasoning_mode` | `model_tier` | `budget_class` | `verification_depth` |
-|---|---|---|---|---|
-| Trivial or routine execution | `fast` | `fast` | `low` | `light` |
-| Ambiguous but bounded specialist work | `slow` | `smart` | `standard` | `standard` |
-| High-stakes planning, repeated contradiction, or hard synthesis | `slow` | `deep-reasoning` | `high` | `deep` |
-| True multi-path arbitration | `slow` | `council` | `high` | `deep` |
-
-**Budget justification rule:** `budget_class=high` requires a one-line reason tied to risk, novelty, repeated contradiction, or explicit user request. No council fan-out or deep-reasoning tier on unchanged evidence without that justification.
-
-**Model-aware damping rule:** If the selected model already tends to over-deliberate, prefer `model_tier=smart` over `deep-reasoning` unless the user explicitly asked for deep reasoning or the decision is both high-stakes and genuinely unresolved after one bounded pass. Slow mode should narrow and terminate the work, not inflate it.
-
-**Bounded-pass rule:** Slow mode operates on one decision question with the current anchor plus at most 3 additional evidence pulls before it must choose `act`, `ask`, or `escalate`. Unfamiliarity alone is not enough to justify a high-budget deep-reasoning route.
-
-**Examples:**
-- "Single-file rename" → `fast`, `fast`, `low`, `light`
-- "Bug reproduced but root cause still ambiguous" → `slow`, `smart`, `standard`, `standard`
-- "Architectural choice with 2 costly viable paths" → `slow`, `deep-reasoning`, `high`, `deep`
-- "Need a real pro/con verdict before committing to a rewrite" → `slow`, `council`, `high`, `deep`
-
-Slow mode is a single forward pass with a visible start and a hard stop. It begins only after intent is locked and ends in exactly one of three terminal states: `act`, `ask`, or `escalate`.
-
-**Processing flow — 6 phases, no backwards movement:**
-
-| Phase | Output required | Loop check (mandatory before proceeding) |
-|---|---|---|
-| **1. Scope + Gist** | Bottom-line gist, locked objective, decision question, stop condition | "Do I know exactly what decision or answer this work is driving?" |
-| **2. Evidence** | Minimum evidence set that can change the gist | "Am I collecting detail that cannot change the call?" |
-| **3. Disconfirm** | One competing explanation, stale-memory risk, or falsifier | "Did I seriously test the current story?" |
-| **4. Decision** | Chosen approach with trade-offs | "Am I reopening closed options without new evidence?" |
-| **5. Act** | Code changes, delegation, or explicit recommendation | "Is my output materially different from last turn?" |
-| **6. Verify** | Objective checks + final gist + terminal state (`act`, `ask`, or `escalate`) | "Can I close this with act, ask, or escalate right now?" |
-
-**Hard rules (not guidelines — these are circuit breakers):**
-
-1. **Research is one pass.** If you need more, note what's missing and proceed anyway. Missing info is a limitation, not a reason to loop.
-
-2. **Never re-enter a completed phase.** Moving Scope → Evidence → Decision means the earlier phase is closed unless materially new evidence appears.
-
-3. **If output looks like the previous output, STOP.** Emit a one-line summary of what you know, then act or escalate. Do not re-analyze.
-
-4. **WYSIATI produces a list, not a loop.** "What am I missing?" is answered once as a written list of known unknowns. It does NOT trigger re-research.
-
-5. **Max one self-correction cycle.** If the correction doesn't work, tell the user what failed and ask for direction. Do not try a third approach.
-
-6. **Memory conflicts use shared precedence rules in `_shared/memory-systems.md`.** Specialists can detect conflicts; the orchestrator owns routing and arbitration.
-
-7. **Stable intent is locked.** Slow mode may change the plan of attack, but it may not silently change the requested deliverable on unchanged evidence.
-
-8. **Slow mode must terminate.** End in exactly one of `act`, `ask`, or `escalate`. If you cannot justify another move, stop and emit the best current gist.
-
-**Slow Mode Research Phase — Memory Tools (use in order):**
-1. `brain-router_brain_query` — past decisions, bugfixes, patterns on this topic
-2. `engram_mem_search` — structured observations (decisions, architecture, bugfixes)
-3. `mempalace_mempalace_search` — verbatim content (meeting notes, detailed patterns, requirements)
-4. `engram_mem_timeline` — chronological context around a past decision
-5. Read project CLAUDE.md, AGENTS.md, handoff.md, anti-patterns.md
-
-**WYSIATI Guard (MANDATORY — for ambiguous, high-stakes, or slow-mode work):**
-1. What critical evidence is missing?
-2. What competing explanation or route still fits?
-3. What retrieved memory could be stale or context-shifted?
-4. What concrete repo, test, or doc evidence would falsify the current story?
-
-**Memory Conflict Arbitration (MANDATORY):**
-- Prefer live repo/tool output, then fresh official docs or fresh research, then structured memory, then verbatim memory.
-- Do not silently average contradictions. State the competing claims and choose or escalate.
-- If conflict remains material after one pass, route targeted evidence gathering once or escalate to user.
-
-**Oscillation Guard (MANDATORY):**
-- The same decision must not bounce repeatedly between `@strategist`, `@generalist`, `@auditor`, and `@council` on unchanged evidence.
-- Trigger if there are 2 reroutes for the same decision, alternating verdicts, or repeated council/strategist review without new evidence.
-- Build one arbitration packet: question, current gist, conflicting outputs, evidence checked, unknowns, and stop condition.
-- Route once: `@council` if stakes are high and it has not already run on this evidence; otherwise `@strategist` for a final synthesis.
-- Max on unchanged evidence: 1 council round + 1 strategist synthesis. After that, escalate to user.
-
-### Cognitive Load Management
-- **Token budgets per phase** — Don't dump entire codebase into one prompt
-- **Session limits** — Long slow-mode sessions degrade → handoff to fresh instance at 60% context
-- **Progressive disclosure** — Read only what's needed for the current step
-- **Single-pass reasoning** — Think once, challenge once, act. No multi-cycle rituals.
-
-### Anti-Patterns
-| Anti-Pattern | Symptom | Circuit Breaker |
-|---|---|---|
-| **Infinite analysis loop** | Same comparison table or reasoning emitted 2+ times | STOP. One-line summary → act or escalate. |
-| **WYSIATI re-research trap** | "What am I missing?" triggers new research pass | WYSIATI produces a written list, NOT action. |
-| **Phase regression** | Leaving Decision then going back to earlier phases without new evidence | Phase lock — completed phases stay closed. |
-| **Overthinking** | Slow mode activated for fast-mode tasks | Trust the triggers — if none fire, stay fast |
-| **Context exhaustion** | Slow-mode session runs too long | Handoff at 60% context, fresh session |
-| **Unresolved memory conflict** | Memory disagrees with live evidence and gets hand-waved | Apply shared precedence or escalate. |
-| **Multi-agent oscillation** | Strategist/generalist/auditor/council revisit the same decision on unchanged evidence | Arbitration packet → one bounded final route. |
-| **Attribute substitution** | Solving easier proxy problem | Re-read original request before claiming done |
-| **Intent drift** | Clear request gets silently reframed mid-analysis | Re-lock the deliverable; reopen only on new evidence or user correction. |
-| **Open-ended slow mode** | Analysis keeps going without a terminal move | Force one of `act`, `ask`, or `escalate`, then stop. |
+### Oscillation Guard
+The same decision must not bounce between `@strategist`, `@generalist`, `@auditor`, and `@council` on unchanged evidence. Trigger: 2+ reroutes, alternating verdicts, or repeated review. Build one arbitration packet → route to `@council` (if high-stakes and not already run) or `@strategist` (final synthesis). Max: 1 council round + 1 strategist synthesis, then escalate to user.
 
 ## Routing Decision Tree (apply to EVERY message)
 
