@@ -1,8 +1,12 @@
 # Anti-Patterns — Known Failures & Working Fixes
 
-> Claude checks this before debugging to avoid repeating known-bad approaches.
+> OpenCode agents check this before debugging to avoid repeating known-bad approaches.
 > Pruned 2026-04-01: kept recurring behavioral patterns + permanent rules. One-time bug fixes removed (the fix is in the code).
-> Last updated: 2026-04-16
+> Last updated: 2026-04-22
+>
+> **SYSTEM BOUNDARY:** This file is for the **OpenCode 8-agent-team system** ONLY.
+> For Claude Code anti-patterns, see the separate system at `~/.claude/anti-patterns.md`.
+> Never sync or copy between these two systems.
 
 ## UFC — Scraper Display-Text Anchor Collides on Duplicate Listings (BFO_DISPLAY_TEXT_FIRST_MATCH) — 2026-04-16
 - **Pattern**: `_find_bfo_event_link()` in `scrape_ou_odds.py` used `page_text.find(display_text)` to anchor on a candidate event link, then checked nearby fighter names. BestFightOdds occasionally lists ONE UFC card under TWO event pages with identical display text — e.g. April 18 prelims (`/events/ufc-winnipeg-4130`) + April 19 main card (`/events/ufc-winnipeg-4145`), both labeled "UFC Winnipeg". `find()` returns the FIRST occurrence, the matcher anchored on prelims, never visited the main card, and the cache silently lost ALL headliner O/U lines (Burns, Malott, Jasudavicius, Silva, Young, Moises, Phillips, Jourdain). Frontend rendered "Over 2.5 skipped — price outside gate" because `over_odds=None` returned the same `over_price_blocked` reason code as a genuinely out-of-gate price. User saw the misleading message and reported it as a gate bug.
