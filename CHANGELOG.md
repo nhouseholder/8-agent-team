@@ -10,6 +10,20 @@ All notable changes to the Agent Orchestration System.
 - Rebuilt `scripts/validate-agents.js` to check composition markers, generated prompt freshness, registry wiring, and reasoning scenarios
 ## [Unreleased]
 
+## [1.8.0] - 2026-04-22
+
+### Audit
+- Full system audit completed: 234 files inventoried, 15 issues identified
+
+### Memory
+- Checkpoint protocol formalized with C1/C2/C3 triggers (Pre-Compaction, Post-Delegation, Session-End)
+
+### Anti-patterns
+- Archive rotation implemented for stale pattern management
+
+### Docs
+- Migration from Claude to OpenCode completed
+
 ## [1.7.1] - 2026-04-21
 
 ### Fixed
