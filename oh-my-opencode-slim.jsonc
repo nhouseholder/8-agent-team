@@ -3,24 +3,27 @@
   "preset": "default",
 
   // Top-level presets (agent model overrides per preset)
+  // NOTE: All agents inherit the active orchestrator/session model by default.
+  // Leave preset models empty or omitted to enable dynamic inheritance.
   "presets": {
     "default": {
       "councillor_1": {
-        "model": "opencode-go/qwen3.6-plus"
+        "model": "opencode/kimi-k2.6"
       },
       "councillor_2": {
-        "model": "opencode-go/qwen3.6-plus"
+        "model": "opencode/kimi-k2.6"
       },
       "councillor_3": {
-        "model": "opencode-go/qwen3.6-plus"
+        "model": "opencode/kimi-k2.6"
       }
     }
   },
 
   // Council configuration (master model only)
+  // NOTE: Leave model empty to inherit the active session model dynamically.
   "council": {
     "master": {
-      "model": "opencode-go/qwen3.6-plus"
+      "model": "opencode/kimi-k2.6"
     }
   },
 

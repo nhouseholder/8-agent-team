@@ -1,8 +1,8 @@
 {
   "$schema": "https://opencode.ai/config.json",
-  "_comment": "Standard config \u2014 full 8-agent core system. Recommended default for most users.",
+  "_comment": "Standard config — full 8-agent core system. Recommended default for most users.",
   "version": "1.6.0",
-  "model": "opencode-go/qwen3.6-plus",
+  "model": "opencode/kimi-k2.6",
   "agent": {
     "orchestrator": {
       "mode": "primary",
@@ -26,18 +26,11 @@
     },
     "council": {
       "mode": "all",
-      "model": "opencode-go/qwen3.6-plus",
       "prompt_file": "agents/council.md"
     },
     "generalist": {
       "mode": "all",
       "prompt_file": "agents/generalist.md"
     }
-  },
-  "models": {
-    "default": "opencode-go/qwen3.6-plus",
-    "fast": "opencode-go/qwen3.6-plus",
-    "smart": "opencode-go/qwen3.6-plus",
-    "creative": "opencode-go/qwen3.6-plus"
   }
 }

@@ -1,8 +1,8 @@
 {
   "$schema": "https://opencode.ai/config.json",
-  "_comment": "With-memory config \u2014 8-agent system + MCP memory systems for persistent cross-session context.",
+  "_comment": "With-memory config — 8-agent system + MCP memory systems for persistent cross-session context.",
   "version": "1.6.0",
-  "model": "opencode-go/qwen3.6-plus",
+  "model": "opencode/kimi-k2.6",
   "mcp": {
     "brain-router": {
       "type": "local",
@@ -58,18 +58,11 @@
     },
     "council": {
       "mode": "all",
-      "model": "opencode-go/qwen3.6-plus",
       "prompt_file": "agents/council.md"
     },
     "generalist": {
       "mode": "all",
       "prompt_file": "agents/generalist.md"
     }
-  },
-  "models": {
-    "default": "opencode-go/qwen3.6-plus",
-    "fast": "opencode-go/qwen3.6-plus",
-    "smart": "opencode-go/qwen3.6-plus",
-    "creative": "opencode-go/qwen3.6-plus"
   }
 }

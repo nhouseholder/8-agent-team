@@ -1,24 +1,16 @@
 {
   "$schema": "https://opencode.ai/config.json",
-  "_comment": "Minimal config \u2014 orchestrator + generalist only. Basic coding assistance with no specialist agents.",
+  "_comment": "Minimal config — orchestrator + generalist only. Agents inherit the active session model automatically.",
   "version": "1.0.0",
-  "model": "opencode-go/qwen3.6-plus",
+  "model": "opencode/kimi-k2.6",
   "agent": {
     "orchestrator": {
       "mode": "primary",
-      "model": "opencode-go/qwen3.6-plus",
       "prompt_file": "agents/orchestrator.md"
     },
     "generalist": {
       "mode": "all",
-      "model": "opencode-go/qwen3.6-plus",
       "prompt_file": "agents/generalist.md"
     }
-  },
-  "models": {
-    "default": "opencode-go/qwen3.6-plus",
-    "fast": "opencode-go/qwen3.6-plus",
-    "smart": "opencode-go/qwen3.6-plus",
-    "creative": "opencode-go/qwen3.6-plus"
   }
 }

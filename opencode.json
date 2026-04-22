@@ -1,10 +1,6 @@
 {
   "$schema": "https://opencode.ai/config.json",
-  "model": "opencode-go/qwen3.6-plus",
-  "plugin": [
-    "oh-my-opencode-slim",
-    "micode"
-  ],
+  "model": "opencode/kimi-k2.6",
   "mcp": {
     "brain-router": {
       "type": "local",
@@ -103,10 +99,10 @@
     }
   },
   "models": {
-    "default": "opencode-go/qwen3.6-plus",
-    "fast": "opencode-go/qwen3.6-plus",
-    "smart": "opencode-go/qwen3.6-plus",
-    "creative": "opencode-go/qwen3.6-plus",
+    "default": "opencode/kimi-k2.6",
+    "fast": "opencode/kimi-k2.6",
+    "smart": "opencode/kimi-k2.6",
+    "creative": "opencode/kimi-k2.6",
     "council-advocate-for": "openrouter/openai/gpt-oss-120b:free",
     "council-advocate-against": "openrouter/xiaomi/mimo-v2-flash:free",
     "council-judge": "openrouter/qwen/qwen3-235b-a22b-thinking-2507:free"
