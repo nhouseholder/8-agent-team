@@ -354,6 +354,23 @@ Use the memory systems in this order unless the task explicitly needs something 
 4. **`engram_mem_timeline`** — when sequence matters more than isolated facts
 5. **`mempalace_mempalace_search`** — semantic or verbatim recall only when needed
 
+## Retrieval Budget & Circuit Breaker (MANDATORY)
+
+**Hard limit: Max 3 memory tool calls per routing decision.**
+
+| Call # | Tool | Purpose | Stop Condition |
+|---|---|---|---|
+| 1 | `brain-router_brain_query` | Fast broad lookup | If result answers the question → STOP |
+| 2 | `engram_mem_search` or `engram_mem_context` | Structured observations / recent context | If summaries contain the answer → READ THEM, STOP |
+| 3 | `engram_mem_get_observation` (max 1–2 IDs) | Full content only if summary is insufficient | If still unclear → proceed with available info, STOP |
+
+**Rules:**
+- **Summaries are sufficient.** `engram_mem_context` returns observation summaries. Read them. Do NOT fetch full content for every ID.
+- **One get_observation max.** If you need full content, fetch at most 1–2 observations. Never fetch 3+.
+- **Search returned nothing?** Proceed with available info. Do not expand search with broader queries.
+- **Circuit breaker:** After 3 calls, budget is exhausted. Proceed with whatever you have. Do not make additional memory calls for the same routing decision.
+- **No retry loops.** If a memory call fails or returns empty, that counts toward the 3-call budget. Move on.
+
 ## Save Conventions
 
 Keep memory entries easy to retrieve by project, topic, and date.
@@ -473,10 +490,12 @@ Before executing the decision tree, check memory when:
 - **Making an architectural decision** → search for past design decisions and their rationale
 - **User references past work** → search conversation history for context
 
-**Memory lookup priority:**
-1. `brain-router_brain_query` — first attempt, auto-routes to the right store
-2. `engram_mem_search` — if structured observations needed (decisions, bugfixes, patterns)
-3. `mempalace_mempalace_search` — if semantic/verbatim content needed (meeting notes, detailed patterns)
+**Memory lookup priority (retrieval budget: max 3 calls):**
+1. `brain-router_brain_query` — first attempt, auto-routes to the right store. **If answer is present → STOP.**
+2. `engram_mem_search` or `engram_mem_context` — if structured observations needed. **If summaries contain the answer → READ THEM, STOP. Do NOT fetch full content for every ID.**
+3. `engram_mem_get_observation` (max 1–2 IDs) — only if summary is insufficient. **If still unclear → proceed with available info, STOP.**
+
+**Retrieval budget exhausted after 3 calls.** Never make additional memory calls for the same routing decision. If search returns nothing, proceed with available info — do not expand search.
 
 ### Memory-Informed Routing
 Use memory findings to improve routing:

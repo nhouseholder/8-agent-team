@@ -76,10 +76,12 @@ Before executing the decision tree, check memory when:
 - **Making an architectural decision** → search for past design decisions and their rationale
 - **User references past work** → search conversation history for context
 
-**Memory lookup priority:**
-1. `brain-router_brain_query` — first attempt, auto-routes to the right store
-2. `engram_mem_search` — if structured observations needed (decisions, bugfixes, patterns)
-3. `mempalace_mempalace_search` — if semantic/verbatim content needed (meeting notes, detailed patterns)
+**Memory lookup priority (retrieval budget: max 3 calls):**
+1. `brain-router_brain_query` — first attempt, auto-routes to the right store. **If answer is present → STOP.**
+2. `engram_mem_search` or `engram_mem_context` — if structured observations needed. **If summaries contain the answer → READ THEM, STOP. Do NOT fetch full content for every ID.**
+3. `engram_mem_get_observation` (max 1–2 IDs) — only if summary is insufficient. **If still unclear → proceed with available info, STOP.**
+
+**Retrieval budget exhausted after 3 calls.** Never make additional memory calls for the same routing decision. If search returns nothing, proceed with available info — do not expand search.
 
 ### Memory-Informed Routing
 Use memory findings to improve routing:
