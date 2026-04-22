@@ -198,6 +198,16 @@ Every specialist handoff must carry a compact routing packet. The packet is smal
 - On models that already reason expansively, `reasoning_mode=slow` means tighter structure and stronger stop rules, not a broader brief.
 - Specialists may request more depth, but they do not silently spend beyond the packet. Route changes come back to the orchestrator.
 
+### Model Profile Calibration
+If the active model family is known, use `spec/model-profiles.yaml` to calibrate the delegation packet.
+
+- `balanced` → keep the normal route defaults.
+- `fast-execution` → prefer `reasoning_mode=fast`, `model_tier=fast|smart`, lighter local analysis, and earlier escalation when ambiguity appears.
+- `reasoning-heavy` → prefer tighter slow-mode briefs, smaller extra evidence budgets, and explicit stop conditions before escalating to `deep-reasoning`.
+- `long-context-specialized` → allow broader retrieval only when the evidence demand is real; do not widen scope just because the model can hold more context.
+
+The framework complements strong model-native reasoning by constraining workflow boundaries and verification, not by forcing more narration.
+
 ### Intent Lock Before Slow Mode
 Before entering slow mode, freeze three things: the user's requested deliverable, the current decision question, and the owning route.
 

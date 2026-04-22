@@ -1,0 +1,45 @@
+name: Validate
+
+on:
+  pull_request:
+  push:
+    branches:
+      - main
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+
+      - name: Install repo dependencies
+        run: npm ci --ignore-scripts
+
+      - name: Install OpenCode CLI
+        run: npm install --global opencode-ai@latest
+
+      - name: Verify OpenCode CLI
+        run: opencode --version
+
+      - name: Compose runtime prompts
+        run: npm run compose
+
+      - name: Run validation suite
+        run: npm run validate
+
+      - name: Run reasoning benchmark
+        run: npm run benchmark:reasoning
+
+      - name: Check install dependencies
+        run: npm run check:deps
+
+      - name: Run scratch install smoke test
+        run: npm run smoke:install

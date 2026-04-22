@@ -7,7 +7,7 @@ Detailed specifications for each agent in the orchestration system.
 ## @orchestrator
 
 **Mode:** primary  
-**Model:** opencode-go/qwen3.6-plus
+**Model:** inherits the active OpenCode session model by default
 
 ### Role
 AI coding orchestrator that routes tasks to specialists for optimal quality, speed, cost, and reliability.
@@ -55,7 +55,7 @@ AI coding orchestrator that routes tasks to specialists for optimal quality, spe
 ## @explorer
 
 **Mode:** all  
-**Model:** opencode-go/qwen3.6-plus
+**Model:** inherits the active OpenCode session model by default
 
 ### Role
 Fast codebase navigation specialist. Answers "Where is X?", "Find Y", "Which file has Z".
@@ -98,7 +98,7 @@ Concise answer to the question
 ## @strategist
 
 **Mode:** all  
-**Model:** opencode-go/qwen3.6-plus
+**Model:** inherits the active OpenCode session model by default
 
 ### Role
 Unified strategic advisor, planner, and "what's next" engine. Combines architecture decisions, code review, planning, spec-writing, and strategic recommendations into one advisory agent.
@@ -140,7 +140,7 @@ Unified strategic advisor, planner, and "what's next" engine. Combines architect
 ## @researcher
 
 **Mode:** all  
-**Model:** opencode-go/qwen3.6-plus
+**Model:** inherits the active OpenCode session model by default
 
 ### Role
 Research specialist for libraries, APIs, and external documentation.
@@ -179,7 +179,7 @@ Research specialist for libraries, APIs, and external documentation.
 ## @designer
 
 **Mode:** all  
-**Model:** opencode-go/qwen3.6-plus
+**Model:** inherits the active OpenCode session model by default
 
 ### Role
 Frontend UI/UX specialist for intentional, polished experiences.
@@ -219,7 +219,7 @@ Frontend UI/UX specialist for intentional, polished experiences.
 ## @auditor
 
 **Mode:** all  
-**Model:** opencode-go/qwen3.6-plus
+**Model:** inherits the active OpenCode session model by default
 
 ### Role
 Triple-mode agent. READ MODE for auditing/reviewing/debugging. FIX MODE for implementing changes. REFINE MODE for pattern-based improvements (absorbed from former refiner agent).
@@ -317,7 +317,7 @@ Protocol reference for structured council arbitration. The orchestrator fans out
 ## @generalist
 
 **Mode:** all  
-**Model:** opencode-go/qwen3.6-plus  
+**Model:** inherits the active OpenCode session model by default  
 **Prompt File:** agents/generalist.md
 
 ### Role

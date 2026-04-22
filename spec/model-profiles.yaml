@@ -1,0 +1,51 @@
+# Model capability profiles for this framework.
+#
+# These are operating profiles used to tune routing and slow-mode behavior.
+# They are not claims of absolute benchmark superiority or provider truth.
+# Keep the shipped runtime config model-neutral; use these profiles to adapt
+# reasoning behavior when the active model family is known.
+
+profiles:
+  balanced:
+    reasoning_mode_default: fast
+    model_tier_default: smart
+    budget_class_default: standard
+    evidence_pull_cap: 3
+    slow_mode_strategy: "Use the standard bounded slow-mode flow."
+    complement_rule: "Let the framework provide structure, then get out of the way."
+  fast-execution:
+    reasoning_mode_default: fast
+    model_tier_default: fast
+    budget_class_default: low
+    evidence_pull_cap: 2
+    slow_mode_strategy: "Escalate earlier on ambiguity instead of widening local analysis."
+    complement_rule: "Use for execution-heavy work, short loops, and concrete implementation."
+  reasoning-heavy:
+    reasoning_mode_default: slow
+    model_tier_default: smart
+    budget_class_default: standard
+    evidence_pull_cap: 2
+    slow_mode_strategy: "Tighten boundaries and stop rules so built-in reasoning is complemented, not duplicated."
+    complement_rule: "Do not stack verbose external deliberation on top of already-strong internal thinking."
+  long-context-specialized:
+    reasoning_mode_default: slow
+    model_tier_default: smart
+    budget_class_default: standard
+    evidence_pull_cap: 3
+    slow_mode_strategy: "Use large context only for evidence that materially changes the decision."
+    complement_rule: "Prefer selective retrieval over dumping broad context just because the model can hold it."
+
+model_families:
+  qwen-3.6-plus:
+    profile: balanced
+    usage: "Default general-purpose routing, implementation, and bounded planning."
+  kimi-k2.6:
+    profile: reasoning-heavy
+    usage: "Ambiguous planning, synthesis, and hard debugging when strong built-in reasoning already exists."
+  glm-5.1:
+    profile: reasoning-heavy
+    usage: "Deliberate synthesis and trade-off evaluation with tighter external evidence bounds."
+
+fallbacks:
+  unknown: balanced
+  council_default: balanced

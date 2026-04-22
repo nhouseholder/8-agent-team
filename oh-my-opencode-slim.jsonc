@@ -5,23 +5,15 @@
   // Top-level presets (agent model overrides per preset)
   "presets": {
     "default": {
-      "councillor_1": {
-        "model": "opencode-go/qwen3.6-plus"
-      },
-      "councillor_2": {
-        "model": "opencode-go/qwen3.6-plus"
-      },
-      "councillor_3": {
-        "model": "opencode-go/qwen3.6-plus"
-      }
+      "councillor_1": {},
+      "councillor_2": {},
+      "councillor_3": {}
     }
   },
 
-  // Council configuration (master model only)
+  // Council configuration follows the active session model unless you add overrides
   "council": {
-    "master": {
-      "model": "opencode-go/qwen3.6-plus"
-    }
+    "master": {}
   },
 
   // Disable observer by default (only enable if you need vision analysis)

@@ -1,3 +1,4 @@
 # Runtime mirrors created by local worktree flows
 .claude/worktrees/
 .worktrees/
+node_modules/

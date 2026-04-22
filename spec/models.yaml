@@ -1,16 +1,17 @@
 # Model inheritance policy
 #
 # Default runtime behavior:
-# - Set the top-level `model` in opencode.json, or choose one at runtime in OpenCode.
-# - Primary agents inherit the active session/default model when agent.model is omitted.
+# - The shipped default omits the top-level `model`; choose one at runtime in OpenCode.
+# - If you want a pinned fallback, you may still set the top-level `model` in opencode.json.
+# - Primary agents inherit the active session model when agent.model is omitted.
 # - Subagents inherit the invoking primary agent's model when agent.model is omitted.
 #
 # The repo default intentionally does not ship hardcoded per-agent model IDs.
 # If you want true multi-model council, add explicit valid overrides yourself.
 
 default_behavior:
-  top_level_model: "set in opencode.json or choose at runtime"
-  primary_agents: "inherit the active session/default model when agent.model is omitted"
+  top_level_model: "default repo omits it; choose in OpenCode, or optionally pin one in opencode.json"
+  primary_agents: "inherit the active session model when agent.model is omitted"
   subagents: "inherit the invoking primary agent model when agent.model is omitted"
 
 optional_manual_overrides:

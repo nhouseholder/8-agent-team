@@ -93,15 +93,15 @@ Validation happens in two passes:
 
 ## Model Inheritance Policy
 
-The default runtime keeps `opencode.json` simple: it sets one top-level `model`, then lets agent entries inherit from the active session unless you explicitly add an override.
+The shipped default keeps `opencode.json` simple by omitting a pinned top-level `model`. You choose the session model in OpenCode, and agent entries inherit from that active session unless you explicitly add an override.
 
-- **Top-level `model`** sets the default session model and can still be overridden by OpenCode runtime selection or CLI flags
-- **Primary agents without `model`** inherit the active session/default model
+- **Top-level `model`** is optional. Add it only if you want to pin a fallback session model in config.
+- **Primary agents without `model`** inherit the active OpenCode session model
 - **Subagents without `model`** inherit the invoking primary agent's model
 - **`model_tier` metadata in delegation packets is advisory routing context**, not a requirement to hardcode per-agent model IDs in config
 - **Explicit per-agent overrides are optional advanced configuration** when you intentionally want a different model for a specific agent or councillor
 
-This keeps the shipped config valid and portable while still allowing advanced users to opt into manual model specialization.
+This keeps the shipped config valid, portable, and dynamic while still allowing advanced users to opt into manual model specialization.
 
 ## Per-Agent Slow-Mode Triggers
 

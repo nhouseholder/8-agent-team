@@ -228,8 +228,8 @@ function validateModelConfiguration(config) {
   const errors = [];
   const warnings = [];
 
-  if (!config.model) {
-    errors.push("Missing default model: model");
+  if (Object.prototype.hasOwnProperty.call(config, "model") && !config.model) {
+    errors.push("If opencode.json defines model, it must be non-empty");
   }
 
   if (Object.prototype.hasOwnProperty.call(config, "models")) {
@@ -344,7 +344,14 @@ function validateProductSurfaces(config) {
 
   const expectedAgents = config.agent || {};
   const exampleAgents = standardExample.agent || {};
-  if (standardExample.model !== config.model) {
+  const configHasModel = Object.prototype.hasOwnProperty.call(config, "model");
+  const standardHasModel = Object.prototype.hasOwnProperty.call(standardExample, "model");
+
+  if (standardHasModel !== configHasModel) {
+    errors.push(`examples/standard.json should ${configHasModel ? "include" : "omit"} the default model field to match opencode.json`);
+  }
+
+  if (configHasModel && standardExample.model !== config.model) {
     errors.push(`examples/standard.json default model should be ${config.model}`);
   }
 

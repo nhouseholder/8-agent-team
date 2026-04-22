@@ -1,0 +1,23 @@
+{
+  "name": "opencode-reasoning-framework",
+  "version": "1.7.0",
+  "private": true,
+  "description": "Installable OpenCode multi-agent reasoning framework with composed prompts and validation scripts.",
+  "type": "commonjs",
+  "engines": {
+    "node": ">=18"
+  },
+  "scripts": {
+    "benchmark:reasoning": "node scripts/benchmark-reasoning.js",
+    "compose": "node scripts/compose-prompts.js",
+    "check:deps": "node scripts/check-deps.js",
+    "install:opencode": "node scripts/install-opencode.js",
+    "smoke:install": "node scripts/smoke-test-install.js",
+    "validate:reasoning": "node scripts/validate-reasoning-scenarios.js",
+    "validate:agents": "node scripts/validate-agents.js",
+    "validate": "npm run validate:reasoning && npm run validate:agents"
+  },
+  "dependencies": {
+    "@opencode-ai/plugin": "1.4.11"
+  }
+}

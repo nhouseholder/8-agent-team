@@ -40,12 +40,18 @@ Specialist executes → verifies → reports back
 ## Quick Start
 
 1. Clone this repo
-2. Copy `opencode.json` to `~/.config/opencode/opencode.json` (or merge into your existing config)
-3. **Optionally replace `YOUR_OPENROUTER_KEY`** in the `provider.openrouter.options.apiKey` field if you plan to use OpenRouter models
-  - Get one at https://openrouter.ai/keys (free tier, no credit card required)
-  - The default config works without it unless you explicitly choose an OpenRouter model at runtime
-4. Optionally configure MCP servers (engram, mempalace, brain-router) for persistent memory
-5. Start a session — the orchestrator handles routing automatically
+2. Run `npm ci --ignore-scripts`
+3. Run `npm run validate`
+4. Run `npm run benchmark:reasoning`
+4. Run `npm run check:deps`
+5. Install the runtime assets into your OpenCode config directory with `npm run install:opencode`
+6. Run `npm run smoke:install`
+7. Choose the session model you want in OpenCode
+8. Start a session — the orchestrator handles routing automatically
+
+See [INSTALL.md](INSTALL.md) for the supported bootstrap flow, target overrides, and replacement/force behavior.
+
+The shipped runtime is model-neutral by default. Repo-managed agents inherit the active OpenCode session model unless you add explicit overrides yourself.
 
 > **Without an OpenRouter key**: The default config still works. You only need it if you pick an OpenRouter model at runtime or add explicit council model overrides.
 
@@ -82,6 +88,7 @@ The repo `opencode.json` uses a placeholder. Add your own key only if you want t
 - **Chain Recovery** — failed steps retry, escalate, or pause for user input
 - **Persistent Memory** — three MCP memory systems survive across sessions
 - **Validation** — `scripts/validate-agents.js` checks source markers, generated prompt freshness, registry wiring, and reasoning-scenario integrity
+- **Behavioral Benchmarking** — `npm run benchmark:reasoning` scores routing, ownership, memory, budget, and model-inheritance expectations
 
 ## Architecture
 
@@ -166,7 +173,7 @@ Three persistent memory systems survive across sessions:
 
 ## Version
 
-1.6.1 — Tightened broad-review routing (`@explorer -> @auditor`) and minimum-effective slow mode for already-deliberative models
+1.7.0 — Added install validation, behavioral benchmarking, and a model-neutral runtime that inherits the active OpenCode session model
 
 ## License
 

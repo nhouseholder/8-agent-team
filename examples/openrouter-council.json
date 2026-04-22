@@ -1,7 +1,6 @@
 {
   "$schema": "https://opencode.ai/config.json",
-  "_comment": "OpenRouter-ready config — provider configured for optional OpenRouter use, but agents still inherit the active orchestrator/session model unless you add explicit overrides.",
-  "model": "opencode-go/qwen3.6-plus",
+  "_comment": "OpenRouter-ready config — provider configured for optional OpenRouter use, but agents still inherit the active session model unless you add explicit overrides.",
   "plugin": [
     "oh-my-opencode-slim",
     "micode"

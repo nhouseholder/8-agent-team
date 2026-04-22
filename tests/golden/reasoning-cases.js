@@ -1,0 +1,415 @@
+module.exports = {
+  sourceSets: {
+    specialists: [
+      "agents/explorer.md",
+      "agents/strategist.md",
+      "agents/researcher.md",
+      "agents/designer.md",
+      "agents/auditor.md",
+      "agents/generalist.md",
+    ],
+    councilPrompts: [
+      "agents/council.md",
+      "agents/council-advocate-for.md",
+      "agents/council-advocate-against.md",
+      "agents/council-judge.md",
+    ],
+  },
+  cases: [
+    {
+      label: "orchestrator fast -> agent fast",
+      category: "routing",
+      assertions: [
+        {
+          type: "regex",
+          source: "agents/orchestrator.md",
+          pattern: "Default to fast mode",
+          flags: "i",
+          message: "orchestrator missing fast-by-default routing language",
+        },
+        {
+          type: "every_regex",
+          set: "specialists",
+          pattern: "\\*\\*FAST\\*\\*",
+          message: "one or more specialists missing local FAST ownership",
+        },
+      ],
+    },
+    {
+      label: "orchestrator fast -> agent slow",
+      category: "routing",
+      assertions: [
+        {
+          type: "regex",
+          source: "agents/orchestrator.md",
+          pattern: "recommended mode, not a mandatory one",
+          flags: "i",
+          message: "orchestrator missing recommended-mode-only delegation rule",
+        },
+        {
+          type: "every_regex",
+          set: "specialists",
+          pattern: "\\*\\*SLOW\\*\\*",
+          message: "one or more specialists missing local SLOW ownership",
+        },
+      ],
+    },
+    {
+      label: "orchestrator slow -> agent fast",
+      category: "routing",
+      assertions: [
+        {
+          type: "regex",
+          source: "agents/orchestrator.md",
+          pattern: "Handoff Triggers[\\s\\S]*Route-Level Fast/Slow Ownership|Route-Level Fast/Slow Ownership[\\s\\S]*Handoff Triggers",
+          flags: "i",
+          message: "orchestrator missing explicit route-level slow-mode trigger contract",
+        },
+        {
+          type: "every_regex",
+          set: "specialists",
+          pattern: "may not reroute sideways",
+          flags: "i",
+          message: "one or more specialists missing the no-lateral-reroute boundary rule",
+        },
+      ],
+    },
+    {
+      label: "orchestrator slow -> agent slow",
+      category: "routing",
+      assertions: [
+        {
+          type: "regex",
+          source: "agents/orchestrator.md",
+          pattern: "oscillation control|same-evidence stop rule",
+          flags: "i",
+          message: "orchestrator missing route-level oscillation or same-evidence control",
+        },
+        {
+          type: "every_regex",
+          set: "specialists",
+          pattern: "Local Fast/Slow Ownership",
+          message: "one or more specialists missing explicit local fast/slow ownership",
+        },
+      ],
+    },
+    {
+      label: "council bounded arbitration",
+      category: "council",
+      assertions: [
+        {
+          type: "every_regex",
+          set: "councilPrompts",
+          pattern: "@compose:insert shared-council-kernel",
+          message: "council prompt family missing shared council kernel markers",
+        },
+        {
+          type: "regex",
+          source: "agents/_shared/council-kernel.md",
+          pattern: "Same-Evidence Stop Rule",
+          flags: "i",
+          message: "shared council kernel missing same-evidence stop rule",
+        },
+      ],
+    },
+    {
+      label: "memory precedence order",
+      category: "memory",
+      assertions: [
+        {
+          type: "regex",
+          source: "agents/_shared/memory-systems.md",
+          pattern: "Conflict Resolution",
+          flags: "i",
+          message: "shared memory systems missing conflict resolution precedence",
+        },
+        {
+          type: "regex",
+          source: "agents/_shared/memory-systems.md",
+          pattern: "Priority",
+          flags: "i",
+          message: "shared memory systems missing priority ordering",
+        },
+        {
+          type: "regex",
+          source: "agents/orchestrator.md",
+          pattern: "memory arbitration",
+          flags: "i",
+          message: "orchestrator missing memory arbitration ownership",
+        },
+      ],
+    },
+    {
+      label: "startup memory runtime surface",
+      category: "memory",
+      assertions: [
+        {
+          type: "regex",
+          source: ".opencode/plugins/memory-context-loader.js",
+          pattern: "experimental\\.chat\\.system\\.transform",
+          message: "startup memory plugin missing system-transform hook",
+        },
+        {
+          type: "regex",
+          source: ".opencode/plugins/memory-context-loader.js",
+          pattern: "engram",
+          message: "startup memory plugin missing engram restore path",
+        },
+        {
+          type: "regex",
+          source: ".opencode/plugins/memory-context-loader.js",
+          pattern: "mempalace-mempalace_search",
+          message: "startup memory plugin missing mempalace restore path",
+        },
+        {
+          type: "regex",
+          source: ".opencode/plugins/memory-context-loader.js",
+          pattern: "brain-router MCP tools live",
+          flags: "i",
+          message: "startup memory plugin missing explicit brain-router live-lookup fallback",
+        },
+      ],
+    },
+    {
+      label: "delegation packet metadata",
+      category: "routing",
+      assertions: [
+        {
+          type: "regex",
+          source: "agents/orchestrator.md",
+          pattern: "reasoning_mode[\\s\\S]*model_tier[\\s\\S]*budget_class[\\s\\S]*verification_depth",
+          flags: "i",
+          message: "orchestrator missing delegation packet metadata contract",
+        },
+      ],
+    },
+    {
+      label: "expensive reasoning budget gate",
+      category: "budget",
+      assertions: [
+        {
+          type: "regex",
+          source: "agents/orchestrator.md",
+          pattern: "Budget Gate",
+          flags: "i",
+          message: "orchestrator missing explicit expensive-reasoning budget gate",
+        },
+        {
+          type: "regex",
+          source: "agents/orchestrator.md",
+          pattern: "budget justification",
+          flags: "i",
+          message: "orchestrator missing budget justification discipline",
+        },
+        {
+          type: "regex",
+          source: "agents/_shared/council-kernel.md",
+          pattern: "Budget Justification",
+          flags: "i",
+          message: "shared council kernel missing budget justification discipline",
+        },
+      ],
+    },
+    {
+      label: "slow mode fatal-flaw check",
+      category: "slow-mode",
+      assertions: [
+        {
+          type: "regex",
+          source: "agents/_shared/cognitive-kernel.md",
+          pattern: "fatal-flaw|fatal flaw",
+          flags: "i",
+          message: "shared cognitive kernel missing explicit fatal-flaw test in slow mode",
+        },
+        {
+          type: "regex",
+          source: "agents/_shared/cognitive-kernel.md",
+          pattern: "one self-correction cycle max|one self-correction pass",
+          flags: "i",
+          message: "shared cognitive kernel missing bounded self-correction rule",
+        },
+      ],
+    },
+    {
+      label: "slow mode is model-aware and bounded",
+      category: "slow-mode",
+      assertions: [
+        {
+          type: "regex",
+          source: "agents/_shared/cognitive-kernel.md",
+          pattern: "Minimum-Effective Slow Mode",
+          flags: "i",
+          message: "shared cognitive kernel missing minimum-effective slow mode",
+        },
+        {
+          type: "regex",
+          source: "agents/_shared/cognitive-kernel.md",
+          pattern: "up to 3 additional reads|at most 3 additional evidence pulls",
+          flags: "i",
+          message: "shared cognitive kernel missing bounded evidence rule",
+        },
+        {
+          type: "regex",
+          source: "agents/orchestrator.md",
+          pattern: "Model-aware damping rule",
+          flags: "i",
+          message: "orchestrator missing model-aware damping rule",
+        },
+        {
+          type: "regex",
+          source: "agents/orchestrator.md",
+          pattern: "prefer `model_tier=smart` over `deep-reasoning`",
+          flags: "i",
+          message: "orchestrator missing smart-over-deep-reasoning damping guidance",
+        },
+        {
+          type: "regex",
+          source: "agents/orchestrator.md",
+          pattern: "at most 3 additional evidence pulls",
+          flags: "i",
+          message: "orchestrator missing bounded-pass guard for slow mode",
+        },
+      ],
+    },
+    {
+      label: "stable intent stays locked",
+      category: "intent",
+      assertions: [
+        {
+          type: "regex",
+          source: "agents/orchestrator.md",
+          pattern: "Intent Lock",
+          flags: "i",
+          message: "orchestrator missing explicit stable-intent lock",
+        },
+        {
+          type: "regex",
+          source: "agents/orchestrator.md",
+          pattern: "do not silently broaden, decompose, or reinterpret a clear request",
+          flags: "i",
+          message: "orchestrator missing explicit stable-intent lock against silent reinterpretation",
+        },
+        {
+          type: "regex",
+          source: "agents/orchestrator.md",
+          pattern: "Stable intent may be reopened only on",
+          flags: "i",
+          message: "orchestrator missing bounded conditions for reopening intent",
+        },
+      ],
+    },
+    {
+      label: "slow mode linear terminal flow",
+      category: "slow-mode",
+      assertions: [
+        {
+          type: "regex",
+          source: "agents/orchestrator.md",
+          pattern: "single forward pass",
+          flags: "i",
+          message: "orchestrator missing explicit linear slow-mode pass",
+        },
+        {
+          type: "regex",
+          source: "agents/orchestrator.md",
+          pattern: "act, ask, or escalate",
+          flags: "i",
+          message: "orchestrator missing terminal-state contract",
+        },
+        {
+          type: "regex",
+          source: "agents/_shared/cognitive-kernel.md",
+          pattern: "single forward pass",
+          flags: "i",
+          message: "shared cognitive kernel missing explicit single-pass contract",
+        },
+        {
+          type: "regex",
+          source: "agents/_shared/cognitive-kernel.md",
+          pattern: "one of three terminal states: done, ask, or escalate",
+          flags: "i",
+          message: "shared cognitive kernel missing explicit terminal slow-mode contract",
+        },
+      ],
+    },
+    {
+      label: "clear implementation defaults stay concrete",
+      category: "ownership",
+      assertions: [
+        {
+          type: "regex",
+          source: "agents/orchestrator.md",
+          pattern: "Clear-scope implementation beats meta-analysis",
+          flags: "i",
+          message: "orchestrator missing the clear-scope implementation routing guard",
+        },
+        {
+          type: "regex",
+          source: "agents/orchestrator.md",
+          pattern: "deliverable is concrete[\\s\\S]*@generalist",
+          flags: "i",
+          message: "orchestrator missing the concrete-deliverable default-to-generalist rule",
+        },
+        {
+          type: "regex",
+          source: "agents/orchestrator.md",
+          pattern: "deliverable itself is unclear[\\s\\S]*clarification question",
+          flags: "i",
+          message: "orchestrator missing the concrete-deliverable clarification rule",
+        },
+      ],
+    },
+    {
+      label: "concrete execution requests stay with the execution owner",
+      category: "ownership",
+      assertions: [
+        {
+          type: "regex",
+          source: "agents/orchestrator.md",
+          pattern: "Implementation Ownership Guard",
+          flags: "i",
+          message: "orchestrator missing an explicit implementation-ownership guard",
+        },
+        {
+          type: "regex",
+          source: "agents/orchestrator.md",
+          pattern: "patch, wire, finalize, update, clean up, or integrate",
+          flags: "i",
+          message: "orchestrator missing the concrete execution verb list",
+        },
+        {
+          type: "regex",
+          source: "agents/orchestrator.md",
+          pattern: "Do not divert a concrete change request to planning, council, or open-ended analysis merely because it touches multiple files or still contains local execution choices",
+          flags: "i",
+          message: "orchestrator missing the narrow concrete-execution anti-reroute rule",
+        },
+      ],
+    },
+    {
+      label: "agent model inheritance",
+      category: "config",
+      assertions: [
+        {
+          type: "json_missing_or_truthy",
+          source: "opencode.json",
+          path: "model",
+          message: "opencode.json may omit the default model, but if it defines model it must be non-empty",
+        },
+        {
+          type: "json_missing_key",
+          source: "opencode.json",
+          key: "models",
+          message: "opencode.json should not define an unsupported top-level models block",
+        },
+        {
+          type: "json_every_missing_key",
+          source: "opencode.json",
+          path: "agent",
+          key: "model",
+          message: "opencode.json should let all agents inherit the active orchestrator/session model by default",
+        },
+      ],
+    },
+  ],
+};

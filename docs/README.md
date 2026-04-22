@@ -2,6 +2,8 @@
 
 Detailed documentation for the agent orchestration system.
 
+The shipped runtime is model-neutral by default: choose the session model in OpenCode, and repo-managed agents inherit it unless you add explicit overrides.
+
 ## Documents
 
 | File | Purpose |
@@ -9,6 +11,7 @@ Detailed documentation for the agent orchestration system.
 | [ARCHITECTURE.md](ARCHITECTURE.md) | System architecture, data flow, agent communication patterns |
 | [AGENT-REFERENCE.md](AGENT-REFERENCE.md) | Full reference for each agent: modes, capabilities, escalation paths |
 | [CHAIN-EXAMPLES.md](CHAIN-EXAMPLES.md) | Multi-agent chain patterns and real examples |
+| [MODEL-SELECTION.md](MODEL-SELECTION.md) | Operating profiles for advanced models and model-fit guidance |
 | [USAGE.md](USAGE.md) | How to use the system, configuration, best practices |
 | [TROUBLESHOOTING.md](TROUBLESHOOTING.md) | Common issues and solutions |
 
@@ -24,6 +27,8 @@ Detailed documentation for the agent orchestration system.
 | **auditor** | Debug, review, improve, fix (READ/FIX/REFINE modes) |
 | **council** | Structured council arbitration via orchestrator fan-out to 3 councillor agents |
 | **generalist** | Plan executor, medium tasks, file safety (backup/verify/revert) |
+
+Repo-managed agents stop here. If OpenCode shows additional built-ins or runtime capabilities, they are outside this repo's registration surface.
 
 ## Sources of Truth
 
@@ -48,4 +53,4 @@ The core prompts use a Kahneman-style fast/slow operating heuristic. Treat it as
 
 ## Version
 
-1.6.1 — Tightened broad-review routing (`@explorer -> @auditor`) and minimum-effective slow mode for already-deliberative models
+1.7.0 — Added install validation, behavioral benchmarking, and a model-neutral runtime that inherits the active OpenCode session model

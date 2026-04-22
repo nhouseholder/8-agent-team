@@ -10,6 +10,25 @@ All notable changes to the Agent Orchestration System.
 - Rebuilt `scripts/validate-agents.js` to check composition markers, generated prompt freshness, registry wiring, and reasoning scenarios
 ## [Unreleased]
 
+## [1.7.0] - 2026-04-21
+
+### Added
+- Added a real Node package entry surface with supported scripts and an explicit Node engine requirement
+- Added `scripts/check-deps.js` to classify hard install prerequisites versus optional degraded integrations
+- Added `scripts/install-opencode.js` to stage repo-managed runtime assets into an OpenCode config directory
+- Added `scripts/smoke-test-install.js` for scratch-profile installation verification
+- Added `scripts/reasoning-eval.js`, `scripts/benchmark-reasoning.js`, and `tests/golden/reasoning-cases.js` for executable behavioral reasoning benchmarks
+- Added GitHub Actions validation workflow for compose, validation, reasoning benchmarks, dependency checks, and scratch install smoke tests
+- Added `INSTALL.md` and updated install/troubleshooting docs around the supported bootstrap flow
+- Added `spec/model-profiles.yaml` and `docs/MODEL-SELECTION.md` to classify model families such as Qwen 3.6 Plus, Kimi K2.6, and GLM 5.1 by operating profile
+
+### Changed
+- Made the shipped runtime model-neutral by default so core agents inherit the active OpenCode session model unless explicit overrides are added
+- Neutralized the default `oh-my-opencode-slim.jsonc` council preset so it no longer silently repins councillors to Qwen
+- Updated examples, validators, architecture docs, and agent reference docs to match the dynamic session-model contract
+- Expanded install verification so runtime plugin presets and staged assets are checked together with generated prompt targets
+
+
 ## [1.6.1] - 2026-04-21
 
 ### Fixed

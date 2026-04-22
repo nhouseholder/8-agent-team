@@ -54,6 +54,13 @@ Slow mode is a single forward pass with a visible start and a hard stop. It begi
 - Do not expand the work merely because the model can produce more analysis. More tokens are not more certainty.
 - `slow` on a naturally deliberative model should usually still feel concise: bounded evidence, explicit trade-offs, immediate terminal state.
 
+### 5.6 Model Profile Damping
+- If the active model is known, calibrate slow mode using the operating profiles in `spec/model-profiles.yaml`.
+- `balanced` models use the standard bounded slow-mode flow.
+- `fast-execution` models should prefer quicker terminal states and earlier escalation on ambiguity instead of wider local analysis.
+- `reasoning-heavy` models should get tighter external workflow boundaries: fewer extra evidence pulls, sharper stop conditions, and no redundant requests to "think harder" when the model already deliberates well.
+- `long-context-specialized` models may hold more evidence, but they still must obey selective retrieval and intent lock.
+
 ### 6. Slow Mode Phases
 1. Scope — state the bottom-line gist, lock the objective, define the deliverable, and name the stop condition. Exit only when the decision question is stable.
 2. Evidence — gather only the files, docs, or memory that can materially change the decision. Exit when one more read would not change the call.

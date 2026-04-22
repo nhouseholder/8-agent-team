@@ -2,6 +2,53 @@
 
 ## Common Issues
 
+### Installation Fails
+
+**Symptom:** `npm run install:opencode`, `npm run check:deps`, or `npm run smoke:install` fails.
+
+**Causes:**
+- OpenCode CLI not installed or not on `PATH`
+- Node version below the repo's supported floor
+- Target OpenCode config directory already contains repo-managed files and install was attempted without `--force`
+- Repo-managed runtime preset file is missing while `opencode.json` still references it
+
+**Fix:**
+1. Run `npm run check:deps` and fix any `FAIL` items first
+2. Confirm `opencode --version` works in your shell
+3. Re-run the installer with `--force` only if you intentionally want to replace the repo-managed runtime files in the target directory
+4. Run `npm run smoke:install` to verify a scratch profile before touching your live config again
+
+### Agents Snap Back To Qwen
+
+**Symptom:** You switch models in OpenCode, then other repo-managed agents or council roles fall back to Qwen.
+
+**Causes:**
+- Your live `~/.config/opencode` still uses an older pinned `model`
+- The live runtime still has an older `oh-my-opencode-slim.jsonc` council preset with model overrides
+- You are running from a stale full repo clone instead of the installer-managed runtime surface
+
+**Fix:**
+1. Reinstall the runtime with `npm run install:opencode -- --force`
+2. Confirm `~/.config/opencode/opencode.json` no longer pins a top-level `model`
+3. Confirm `~/.config/opencode/oh-my-opencode-slim.jsonc` no longer contains council model overrides
+4. Restart OpenCode and choose the session model again
+
+### Extra Agents Still Appear
+
+**Symptom:** OpenCode still shows names such as Octto or Commander even though they are not part of this repo's 8-agent team.
+
+**Causes:**
+- Local OpenCode runtime state is stale
+- `~/.config/opencode` is an old full repo clone rather than the clean installer-managed runtime folder
+- The extra items are OpenCode-owned built-ins or runtime capabilities rather than repo-registered agents
+
+**Fix:**
+1. Replace the live runtime with `npm run install:opencode -- --force`
+2. Restart OpenCode so it reloads the cleaned runtime surface
+3. If the stale items remain, treat them as OpenCode-built-ins or runtime capabilities outside this repo's agent roster
+
+Do not delete `~/.opencode` blindly. On this setup it also contains the installed OpenCode CLI, not just disposable runtime state.
+
 ### Agent Not Responding
 
 **Symptom:** Agent returns empty or minimal output.
@@ -51,6 +98,8 @@
 2. Test each MCP: run `engram mcp`, `mempalace-mcp`, `brain-router` individually
 3. Check database paths exist and are accessible
 
+If installation completed but memory still seems unavailable, rerun `npm run check:deps` to see whether the optional MCP commands are missing from `PATH`.
+
 ### Agent Gives Wrong Type of Response
 
 **Symptom:** @strategist starts coding, @auditor starts researching, etc.
@@ -87,7 +136,7 @@
 
 **Fix:**
 1. Provide specific context: "Given [specific constraints], should we use X or Y?"
-2. Verify `agent.council-*` points at 3 distinct models if you expect true council fan-out
+2. Add explicit `agent.council-*` model overrides only if you intentionally want true multi-model council fan-out
 3. Only use council for genuinely high-stakes decisions
 
 ### Deploy Fails
