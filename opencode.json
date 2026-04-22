@@ -81,6 +81,12 @@
     "generalist": {
       "mode": "all",
       "prompt_file": "agents/generated/generalist.md"
+    },
+    "plan": {
+      "disable": true
+    },
+    "build": {
+      "disable": true
     }
   },
   "provider": {
