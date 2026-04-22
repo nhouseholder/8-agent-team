@@ -310,7 +310,7 @@ function validateProductSurfaces(config) {
     }
   }
 
-  const memorySystems = readUtf8("agents/_shared/memory-systems.md");
+  const memorySystems = readUtf8("_shared/memory-systems.md");
   if (/checkpoint\/ledger/i.test(memorySystems)) {
     errors.push("shared memory systems still use checkpoint/ledger hybrid wording");
   }

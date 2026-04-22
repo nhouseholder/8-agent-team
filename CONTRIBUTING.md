@@ -6,7 +6,7 @@
 |---|---|
 | Core routing behavior | `agents/orchestrator.md` |
 | Source prompts and per-agent identity | `agents/<name>.md` |
-| Shared runtime modules | `agents/_shared/*.md` |
+| Shared runtime modules | `_shared/*.md` |
 | Generated runtime prompts | `agents/generated/<name>.md` |
 | Runtime registry | `opencode.json` |
 | Release history | `CHANGELOG.md` |
@@ -61,7 +61,7 @@ Never edit `agents/generated/*.md` directly. They are build artifacts from `node
 
 ## Modifying an Agent
 
-1. Edit the source prompt in `agents/` or the shared runtime module in `agents/_shared/`
+1. Edit the source prompt in `agents/` or the shared runtime module in `_shared/`
 2. Run `node scripts/compose-prompts.js`
 3. Run `node scripts/validate-agents.js`
 4. Test with a sample task

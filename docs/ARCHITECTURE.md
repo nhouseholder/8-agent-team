@@ -50,7 +50,7 @@ The 8-agent orchestration system implements a **router-dispatcher** pattern with
 
 ## Shared Cognitive Kernel
 
-All core agents inherit a shared fast/slow control contract from `agents/_shared/cognitive-kernel.md`, injected at build time into the generated runtime prompts.
+All core agents inherit a shared fast/slow control contract from `_shared/cognitive-kernel.md`, injected at build time into the generated runtime prompts.
 
 - **Fast mode** is the default: one-pass, pattern-matched, minimal-tool execution for clear low-risk work
 - **The orchestrator owns route-level fast/slow choice**, while each specialist owns local fast/slow choice within its own boundary
@@ -79,7 +79,7 @@ The prompt system now has two layers:
   - Built by `scripts/compose-prompts.js`
   - Expand shared blocks into the executable prompt surface used by `opencode.json`
 
-Shared runtime modules live in `agents/_shared/`:
+Shared runtime modules live in `_shared/`:
 
 - `cognitive-kernel.md` — shared fast/slow reasoning contract
 - `memory-systems.md` — shared retrieval order and precedence rules

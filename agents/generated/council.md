@@ -10,7 +10,7 @@ mode: subagent
 **Architecture:** The council is NOT a single agent. It is a protocol executed by the **orchestrator** that fans out to 3 separate subagents with fixed roles. In the default repo config those councillors inherit the invoking orchestrator's active model. If you add explicit valid per-agent `model` overrides, the same protocol can run as true multi-model council.
 
 ## Shared Council Arbitration Contract
-<!-- BEGIN GENERATED BLOCK: shared-council-kernel (agents/_shared/council-kernel.md) -->
+<!-- BEGIN GENERATED BLOCK: shared-council-kernel (_shared/council-kernel.md) -->
 ## COUNCIL ARBITRATION CONTRACT (MANDATORY)
 
 This council round is bounded arbitration on identical evidence, not open-ended exploration.

@@ -12,10 +12,10 @@ const MANIFEST_PATH = path.join(GENERATED_DIR, "manifest.json");
 const MARKER_RE = /<!--\s*@compose:insert\s+([a-z0-9-]+)\s*-->/g;
 
 const SHARED_BLOCKS = {
-  "shared-cognitive-kernel": "agents/_shared/cognitive-kernel.md",
-  "shared-memory-systems": "agents/_shared/memory-systems.md",
-  "shared-completion-gate": "agents/_shared/completion-gate.md",
-  "shared-council-kernel": "agents/_shared/council-kernel.md",
+  "shared-cognitive-kernel": "_shared/cognitive-kernel.md",
+  "shared-memory-systems": "_shared/memory-systems.md",
+  "shared-completion-gate": "_shared/completion-gate.md",
+  "shared-council-kernel": "_shared/council-kernel.md",
 };
 
 const SOURCE_PROMPTS = {

@@ -16,7 +16,7 @@ function scenario(label, checks) {
 
 function runScenarioChecks() {
   const orchestrator = read("agents/orchestrator.md");
-  const cognitiveKernel = read("agents/_shared/cognitive-kernel.md");
+  const cognitiveKernel = read("_shared/cognitive-kernel.md");
   const memoryPlugin = read(".opencode/plugins/memory-context-loader.js");
   const specialists = [
     "explorer.md",
@@ -30,8 +30,8 @@ function runScenarioChecks() {
   const councilFor = read("agents/council-advocate-for.md");
   const councilAgainst = read("agents/council-advocate-against.md");
   const councilJudge = read("agents/council-judge.md");
-  const memorySystems = read("agents/_shared/memory-systems.md");
-  const councilKernel = read("agents/_shared/council-kernel.md");
+  const memorySystems = read("_shared/memory-systems.md");
+  const councilKernel = read("_shared/council-kernel.md");
   const opencode = JSON.parse(read("opencode.json"));
 
   return [

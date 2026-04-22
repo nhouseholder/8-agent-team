@@ -31,7 +31,7 @@ Detailed documentation for the agent orchestration system.
 |---|---|
 | Core routing behavior | `../agents/orchestrator.md` |
 | Source prompts and per-agent identity | `../agents/<name>.md` |
-| Shared runtime modules | `../agents/_shared/*.md` |
+| Shared runtime modules | `../_shared/*.md` |
 | Generated runtime prompts | `../agents/generated/<name>.md` |
 | Runtime registry | `../opencode.json` |
 | Release history | `../CHANGELOG.md` |
@@ -40,8 +40,8 @@ Detailed documentation for the agent orchestration system.
 
 The core prompts use a Kahneman-style fast/slow operating heuristic. Treat it as an agent-control model, not a claim of literal cognitive simulation.
 
-- The canonical prompt contract lives in `../agents/_shared/cognitive-kernel.md`
-- Shared memory retrieval and conflict rules live in `../agents/_shared/memory-systems.md`
+- The canonical prompt contract lives in `../_shared/cognitive-kernel.md`
+- Shared memory retrieval and conflict rules live in `../_shared/memory-systems.md`
 - Executable runtime prompts are generated into `../agents/generated/` by `../scripts/compose-prompts.js`
 - `../opencode.json` points only at generated prompts, not source prompts
 - The architecture view of this contract lives in `ARCHITECTURE.md`

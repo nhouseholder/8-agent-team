@@ -18,7 +18,7 @@ You receive a **COUNCIL BRIEFING** from the orchestrator containing:
 Evaluate the proposal from your own perspective. You do NOT see the other councillors' responses — they run in parallel and the orchestrator synthesizes everything afterward.
 
 ## Shared Council Arbitration Contract
-<!-- BEGIN GENERATED BLOCK: shared-council-kernel (agents/_shared/council-kernel.md) -->
+<!-- BEGIN GENERATED BLOCK: shared-council-kernel (_shared/council-kernel.md) -->
 ## COUNCIL ARBITRATION CONTRACT (MANDATORY)
 
 This council round is bounded arbitration on identical evidence, not open-ended exploration.

@@ -18,7 +18,7 @@ You receive a **COUNCIL BRIEFING** from the orchestrator containing:
 Build the strongest argument AGAINST the proposal based on this briefing.
 
 ## Shared Council Arbitration Contract
-<!-- BEGIN GENERATED BLOCK: shared-council-kernel (agents/_shared/council-kernel.md) -->
+<!-- BEGIN GENERATED BLOCK: shared-council-kernel (_shared/council-kernel.md) -->
 ## COUNCIL ARBITRATION CONTRACT (MANDATORY)
 
 This council round is bounded arbitration on identical evidence, not open-ended exploration.

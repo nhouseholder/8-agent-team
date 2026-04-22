@@ -131,7 +131,7 @@ The system uses a Kahneman-style fast/slow operating contract across the full 8-
 |---|---|
 | Core routing behavior | `agents/orchestrator.md` |
 | Source prompts and per-agent identity | `agents/<name>.md` |
-| Shared runtime modules | `agents/_shared/*.md` |
+| Shared runtime modules | `_shared/*.md` |
 | Generated runtime prompts | `agents/generated/<name>.md` |
 | Runtime registry and prompt file wiring | `opencode.json` |
 | Release history | `CHANGELOG.md` |
@@ -159,7 +159,7 @@ Three persistent memory systems survive across sessions:
 
 - **Config file**: `opencode.json`
 - **Source prompts**: `agents/<name>.md`
-- **Shared runtime modules**: `agents/_shared/*.md`
+- **Shared runtime modules**: `_shared/*.md`
 - **Generated runtime prompts**: `agents/generated/<name>.md`
 - **Prompt builder**: `scripts/compose-prompts.js`
 - **Validation**: `scripts/validate-agents.js`
