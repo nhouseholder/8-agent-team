@@ -160,6 +160,8 @@ Do not move backwards to earlier phases unless materially new evidence appears.
 
 When in DELIBERATE or SLOW mode, use this structured scratchpad. No free-text chain-of-thought.
 
+**Think tool validation is enforced by `scripts/validate-think-tool.js`.** Run it locally or in CI to check compliance.
+
 ```
 THINK_TOOL:
   mode: [deliberate|slow]
