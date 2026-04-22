@@ -75,6 +75,8 @@ Use FAST when the task is narrow, familiar, low-risk, and can be completed in on
 
 **Definition of "evidence pull":** One tool call that returns new information: `read`, `grep`, `glob`, `brain-router_brain_query`, `engram_mem_search`, `engram_mem_timeline`, `webfetch`. Re-reading a previously read file does NOT count as a new pull.
 
+**Memory calls count.** The 3-call retrieval budget in `_shared/memory-systems.md` is a SUBSET of the evidence budget. Memory preflight calls (brain_query, mempalace_search, mem_search) consume evidence pulls. A FAST-mode agent that uses `brain-router_brain_query` has used its 0-pull budget and must proceed. A DELIBERATE-mode agent that uses `brain-router_brain_query` + `mempalace_mempalace_search` has used 2 pulls and has 1 remaining.
+
 ---
 
 ## 6. DELIBERATE Mode (bounded check)

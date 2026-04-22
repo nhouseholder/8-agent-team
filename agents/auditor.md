@@ -131,20 +131,26 @@ You are the last of a lineage of builders who once constructed the foundations o
 # Gate 3: Lint + test + build → ABORT if any fails
 ```
 
-### Diff-Impact Check (uses codebase-map.json)
+### Diff-Impact Check (uses codebase-map.json v2)
 
 Before implementing fixes or during READ MODE review:
-1. Read `thoughts/ledgers/codebase-map.json` if it exists
-2. Compare changed files against:
+1. Read `.explorer/codebase-map.json` v2 if it exists (fall back to `thoughts/ledgers/codebase-map.json` v1)
+2. For each changed file, look up its `page_rank`, `risk_score`, and `is_entry_point`:
+   - **High `risk_score` (>0.15)** → file is important AND undertested. Changes here need extra verification and test coverage review.
+   - **High `page_rank` (>0.1)** → architectural hotspot. Broad impact. Require stronger justification.
+   - **`is_entry_point: true`** → warn if modified without explicit test coverage
+   - **`confidence: "inferred"`** → explorer couldn't parse this file. Recommend manual review of imports/dependencies before modifying.
+3. Check TESTED_BY edges: if changing a file with no test coverage, flag for test addition
+4. Compare changed files against:
    - `entry_points`: warn if entry point modified without explicit test coverage
    - `hot_files`: flag high-touch files; require stronger verification
    - `module_boundaries`: warn if change crosses module boundary (indicates architectural drift)
    - `cross_cutting_concerns`: require broader regression testing if concern files touched
    - `dependency_graph`: surface indirect consumers that may be affected
-3. Include impact assessment in `<verification>` block:
-   - `Impact: low` — isolated change within one module
-   - `Impact: moderate` — touches hot file or crosses one boundary
-   - `Impact: high` — touches entry point, cross-cutting concern, or >2 modules
+5. Include impact assessment in `<verification>` block:
+   - `Impact: low` — isolated change within one module, low risk_score
+   - `Impact: moderate` — touches hot file or crosses one boundary, or risk_score 0.05-0.15
+   - `Impact: high` — touches entry point, cross-cutting concern, >2 modules, or risk_score >0.15
 
 ### Data Consistency Check
 For any stats, dashboard, or data display:

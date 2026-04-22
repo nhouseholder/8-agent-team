@@ -100,9 +100,18 @@ FRAME → SKETCH → DECIDE → PROTOTYPE → TEST
 
 ## ASSESSMENT Mode — "What's Next"
 1. Gather git state, handoffs, project info
-2. Classify project state (ACTIVE-HOT/WARM/COLD/BLOCKED)
-3. Generate 3-5 prioritized recommendations with What/Why/Impact/Effort
-4. End with a suggested session plan
+2. Read `.explorer/codebase-map.json` v2 if available — use `page_rank` and `risk_score` to identify architectural hotspots
+3. Classify project state (ACTIVE-HOT/WARM/COLD/BLOCKED)
+4. Generate 3-5 prioritized recommendations with What/Why/Impact/Effort
+5. End with a suggested session plan
+
+### Using codebase-map.json v2 for prioritization
+When `codebase-map.json` v2 is available from @explorer:
+- **High `risk_score` (>0.15)** → files that are both important (high pagerank) AND lack test coverage. Prioritize these for testing or refactoring.
+- **High `page_rank` (>0.1)** → architectural hotspots. Changes here have broad impact. Require stronger justification and broader verification.
+- **Entry points** (`is_entry_point: true`) → always flag in plans. Entry point changes need explicit test coverage.
+- **Files with `confidence: "inferred"`** → the explorer couldn't parse imports/definitions. Recommend deeper investigation before modifying.
+- **TESTED_BY edges** → use to assess test coverage gaps. Files with high risk_score but no TESTED_BY edges are prime targets for test writing.
 
 ## BRIEFING Mode — Session Start
 1. Read most recent handoff and ledger

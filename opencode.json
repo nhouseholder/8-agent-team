@@ -54,14 +54,17 @@
     },
     "council-advocate-for": {
       "mode": "subagent",
+      "model": "openrouter/openai/gpt-oss-120b:free",
       "prompt_file": "agents/generated/council-advocate-for.md"
     },
     "council-advocate-against": {
       "mode": "subagent",
+      "model": "openrouter/xiaomi/mimo-v2-flash:free",
       "prompt_file": "agents/generated/council-advocate-against.md"
     },
     "council-judge": {
       "mode": "subagent",
+      "model": "openrouter/qwen/qwen3-235b-a22b-thinking-2507:free",
       "prompt_file": "agents/generated/council-judge.md"
     },
     "generalist": {
@@ -78,7 +81,7 @@
   "provider": {
     "openrouter": {
       "options": {
-        "apiKey": "YOUR_OPENROUTER_KEY"
+        "apiKey": "{env:OPENROUTER_API_KEY}"
       }
     }
   }

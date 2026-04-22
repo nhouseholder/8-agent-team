@@ -93,20 +93,24 @@ For tasks without a formal plan:
 **Phase 1: CONTEXT** (always)
 - Read relevant files before editing
 - Check project conventions (AGENTS.md, CLAUDE.md, existing patterns)
+- Read `.explorer/codebase-map.json` v2 if available — check `risk_score` and `page_rank` for files you plan to modify
 
 **Phase 2: EXPLORE** (if needed)
 - glob/grep/ast_grep for context
 - quick docs lookup only to confirm syntax for a known dependency already in scope
 - Don't over-explore — get enough to act
+- If modifying a file with `risk_score > 0.15` or `page_rank > 0.1`, check TESTED_BY edges and `imported_by` to understand blast radius
 
 **Phase 3: IMPLEMENT**
 - Backup files before editing (same rules as Plan Mode)
 - Use existing libraries/patterns — don't reinvent
 - Make changes directly and efficiently
+- For high-risk files (risk_score > 0.15): make smaller, more targeted changes; verify more aggressively
 
 **Phase 4: VERIFY**
 - `lsp_diagnostics` on all changed files
 - Run tests if relevant
+- If any changed file has `risk_score > 0.15`, run broader tests (not just the immediate area)
 - Report what was done and verification results
 
 ## File Safety Rules
