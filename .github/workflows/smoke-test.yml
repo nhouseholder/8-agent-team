@@ -1,0 +1,56 @@
+name: Smoke Test
+
+on:
+  push:
+    branches: [main, master]
+  pull_request:
+    branches: [main, master]
+
+jobs:
+  smoke-test:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: Run prompt composition
+        run: node scripts/compose-prompts.js
+
+      - name: Verify generated directory exists
+        run: |
+          if [ ! -d "agents/generated" ]; then
+            echo "❌ agents/generated/ directory missing"
+            exit 1
+          fi
+          echo "✅ agents/generated/ exists"
+
+      - name: Verify generated files exist
+        run: |
+          file_count=$(find agents/generated/ -maxdepth 1 -type f | wc -l)
+          if [ "$file_count" -eq 0 ]; then
+            echo "❌ No files in agents/generated/"
+            exit 1
+          fi
+          echo "✅ Found $file_count generated file(s)"
+          ls -1 agents/generated/
+
+      - name: Verify manifest.json exists and is valid JSON
+        run: |
+          if [ ! -f "agents/generated/manifest.json" ]; then
+            echo "❌ agents/generated/manifest.json missing"
+            exit 1
+          fi
+          if ! jq empty agents/generated/manifest.json; then
+            echo "❌ agents/generated/manifest.json is invalid JSON"
+            exit 1
+          fi
+          echo "✅ manifest.json is valid JSON"
+
+      - name: Run agent validation
+        run: node scripts/validate-agents.js --check=generated --quiet
