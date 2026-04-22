@@ -877,6 +877,7 @@ PROCEED / PROCEED WITH CAVEATS / REJECT / NEEDS MORE DATA
 - If a user-added councillor model override fails → note which one failed, proceed with remaining 2
 - If 2+ councillors fail → fall back to @strategist
 - If explicit overrides are invalid or unavailable → remove them and let councillors inherit the active orchestrator/session model
+- **CRITICAL:** If you see `ProviderModelNotFoundError` on council agents, the explicit OpenRouter model overrides are failing. Remove the `model` fields from council-advocate-for, council-advocate-against, and council-judge in `opencode.json` to make them inherit the active model.
 
 ## Communication
 
@@ -914,12 +915,25 @@ These auto-trigger via their SKILL.md files and don't need agent delegation.
 ### Timeout
 - If an agent takes too long: interrupt, save partial results, report status
 
+### Subagent Timeout & Failure Recovery (CRITICAL)
+When spawning subagents (especially council fan-out):
+
+1. **Set explicit timeout** — Subagents must return within 120 seconds. If not, treat as failed.
+2. **Detect model failures** — If subagent hits `ProviderModelNotFoundError` or auth error, it failed due to model config, not reasoning.
+3. **Fallback on failure** — If a council subagent fails:
+   - Retry once with the active session model (remove explicit model override)
+   - If retry fails: proceed with remaining councillors (2-of-3 or 1-of-3)
+   - If 2+ councillors fail: abort council, fall back to @strategist
+4. **Never wait indefinitely** — If subagent hangs, interrupt after timeout and proceed with partial results
+5. **Log failures** — Save subagent failure to `engram_mem_save` with topic_key `system/subagent-failure` for debugging
+
 ### Fallback Chain
 - @strategist unavailable → @generalist (light planning)
 - @researcher unavailable → @generalist (light research)
 - @designer unavailable → @generalist (functional UI)
 - @auditor unavailable → @generalist (basic debugging)
 - @explorer unavailable → orchestrator does targeted search
+- Council unavailable (2+ councillors failed) → @strategist (devil's advocate mode)
 
 ## Chain Recovery Protocol
 
