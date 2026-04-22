@@ -81,7 +81,7 @@
   "provider": {
     "openrouter": {
       "options": {
-        "apiKey": "{env:OPENROUTER_API_KEY}"
+        "apiKey": "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"
       }
     }
   }
