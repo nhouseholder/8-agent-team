@@ -164,6 +164,12 @@ Three persistent memory systems survive across sessions:
 - **Prompt builder**: `scripts/compose-prompts.js`
 - **Validation**: `scripts/validate-agents.js`
 
+## Extracted Skills
+
+| Skill | Description | Repository |
+|---|---|---|
+| **website-design-agent** | Website design, creative direction, design references, critique, visual audit, and design tokens | [github.com/nhouseholder/website-design-agent](https://github.com/nhouseholder/website-design-agent) *(placeholder)* |
+
 ## Version
 
 1.7.1 — Restored valid OpenCode config inheritance after a `models` regression on main
