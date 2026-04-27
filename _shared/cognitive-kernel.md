@@ -1,4 +1,4 @@
-## COGNITIVE KERNEL v2.0 — 3-Tier Reasoning Contract (MANDATORY)
+## COGNITIVE KERNEL v2.1 — 3-Tier Reasoning Contract (MANDATORY)
 
 Every core agent uses the same graduated reasoning contract so routing, memory use, and verification stay consistent across the system. This is a Kahneman-style control heuristic for agent behavior, not a claim that the repo faithfully models settled human dual-process psychology.
 
@@ -30,15 +30,14 @@ Every core agent uses the same graduated reasoning contract so routing, memory u
 ---
 
 ## 3. Memory Preflight
-- Session start: use automatic startup restore when available; if you need a manual refresh, call `engram_mem_context` explicitly.
-- Before non-trivial work: query `brain-router_brain_query` first.
-- If the task touches a known project, recurring bug, or past decision: follow with `engram_mem_search`.
-- Use `engram_mem_timeline` when chronological context around a past decision is needed.
+- Session start: read the most recent session memory file from `~/.opencode/projects/<project>/memory/sessions/` when available.
+- Before non-trivial work: search project memory files for relevant decisions and patterns.
+- If the task touches a known project, recurring bug, or past decision: read the specific memory file.
 - Check `thoughts/ledgers/codebase-map.json` if present. Use it to:
   - Confirm module boundaries before assuming file organization
   - Identify hot files when investigating regressions
   - Cross-check entry points when verifying deployment scope
-- Treat `brain-router_brain_context` as an on-demand structured-memory refresh, not mandatory startup ceremony.
+- Treat project memory as an on-demand structured refresh, not mandatory startup ceremony.
 - If retrieved memory conflicts with live repo evidence or fresh tool output, follow the shared precedence rules in `_shared/memory-systems.md` instead of inventing a local rule.
 
 ---
@@ -73,9 +72,9 @@ Use FAST when the task is narrow, familiar, low-risk, and can be completed in on
 - Do not trigger multi-step research or analysis unless a slow-mode signal appears.
 - If the gist depends on missing evidence, stale memory, or conflicting signals, escalate to DELIBERATE.
 
-**Definition of "evidence pull":** One tool call that returns new information: `read`, `grep`, `glob`, `brain-router_brain_query`, `engram_mem_search`, `engram_mem_timeline`, `webfetch`. Re-reading a previously read file does NOT count as a new pull.
+**Definition of "evidence pull":** One tool call or file read that returns new information: `read`, `grep`, `glob`, `search`, `fetch`, or reading a memory file. Re-reading a previously read file does NOT count as a new pull.
 
-**Memory calls count.** The 3-call retrieval budget in `_shared/memory-systems.md` is a SUBSET of the evidence budget. Memory preflight calls (brain_query, mempalace_search, mem_search) consume evidence pulls. A FAST-mode agent that uses `brain-router_brain_query` has used its 0-pull budget and must proceed. A DELIBERATE-mode agent that uses `brain-router_brain_query` + `mempalace_mempalace_search` has used 2 pulls and has 1 remaining.
+**Memory calls count.** The 3-call retrieval budget in `_shared/memory-systems.md` is a SUBSET of the evidence budget. Memory preflight calls (searching memory files, reading session history) consume evidence pulls. A FAST-mode agent that reads one memory file has used its 0-pull budget and must proceed. A DELIBERATE-mode agent that searches memory + reads a session file has used 2 pulls and has 1 remaining.
 
 ---
 
@@ -132,6 +131,7 @@ Do not move backwards to earlier phases unless materially new evidence appears.
 - Prefer the minimum extra evidence needed to change the call. If the current anchor plus up to 3 additional reads cannot change the decision, stop reading.
 - Do not expand the work merely because the model can produce more analysis. More tokens are not more certainty.
 - `slow` on a naturally deliberative model should usually still feel concise: bounded evidence, explicit trade-offs, immediate terminal state.
+- Specialists make a single forward pass, then choose one of three terminal states: done, ask, or escalate. No repeated slow-mode cycles on unchanged evidence.
 
 ---
 
@@ -192,9 +192,9 @@ If you cannot answer these, lower confidence or escalate.
 
 After successfully solving a novel problem in DELIBERATE or SLOW mode:
 
-1. Save the pattern via `engram_mem_save` with a stable `topic_key` (e.g., `architecture/auth-model`, `bugfix/fts5-special-chars`)
+1. Save the pattern to a project memory file with a stable topic key (e.g., `architecture/auth-model`, `bugfix/fts5-special-chars`)
 2. Include: **What** was done, **Why** it worked, **Where** files affected, **Learned** gotchas
-3. This caches the DELIBERATE/SLOW solution so FAST mode can find it via `brain-router_brain_query` next time
+3. This caches the DELIBERATE/SLOW solution so FAST mode can find it next time
 4. Only save genuine patterns — not trivial changes or one-off fixes
 
 **Goal:** Successful slow patterns graduate to fast skills. The framework gets faster over time.
@@ -215,7 +215,7 @@ MODE_CALIBRATION:
   would_fast_have_sufficed: [yes|no|uncertain]
 ```
 
-Save this to `engram_mem_save` with `topic_key: "reasoning/calibration"`.
+Save this to a project memory file under `reasoning/calibration.md`.
 
 **Purpose:** Build empirical data on which tasks actually need which mode. Over time, this enables data-driven mode assignment instead of heuristic guessing.
 

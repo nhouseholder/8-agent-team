@@ -1,7 +1,7 @@
 {
   "$schema": "https://opencode.ai/config.json",
   "_comment": "Standard config — current 8-agent runtime. Choose the session model in OpenCode; agents inherit it unless you add explicit overrides.",
-  "version": "1.7.1",
+  "version": "1.8.0",
   "agent": {
     "orchestrator": {
       "mode": "primary",
@@ -34,21 +34,31 @@
     },
     "council-advocate-for": {
       "mode": "subagent",
+      "model": "openrouter/openai/gpt-oss-120b:free",
       "prompt_file": "agents/generated/council-advocate-for.md"
     },
     "council-advocate-against": {
       "mode": "subagent",
+      "model": "openrouter/xiaomi/mimo-v2-flash:free",
       "prompt_file": "agents/generated/council-advocate-against.md"
     },
     "council-judge": {
       "mode": "subagent",
+      "model": "openrouter/qwen/qwen3-235b-a22b-thinking-2507:free",
       "prompt_file": "agents/generated/council-judge.md"
+    },
+    "plan": {
+      "disable": true
+    },
+    "build": {
+      "disable": true
     },
     "generalist": {
       "mode": "all",
       "prompt_file": "agents/generated/generalist.md"
     }
   },
+  "model": "opencode/kimi-k2.6",
   "provider": {
     "openrouter": {
       "options": {

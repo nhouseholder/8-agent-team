@@ -44,7 +44,7 @@ Specialist executes → verifies → reports back
 3. **Optionally replace `YOUR_OPENROUTER_KEY`** in the `provider.openrouter.options.apiKey` field if you plan to use OpenRouter models
   - Get one at https://openrouter.ai/keys (free tier, no credit card required)
   - The default config works without it unless you explicitly choose an OpenRouter model at runtime
-4. Optionally configure MCP servers (engram, mempalace, brain-router) for persistent memory
+4. Run `node scripts/compose-prompts.js` to generate agent prompts
 5. Start a session — the orchestrator handles routing automatically
 
 > **Without an OpenRouter key**: The default config still works. You only need it if you pick an OpenRouter model at runtime or add explicit council model overrides.
@@ -73,9 +73,9 @@ The repo `opencode.json` uses a placeholder. Add your own key only if you want t
 
 ## Features
 
-- **22-step decision tree** classifies every request and routes to the right agent
-- **Memory Retrieval Protocol** — checks engram/mempalace/brain-router before routing
-- **Shared Cognitive Kernel** — every core agent defaults to fast mode and escalates to slow mode only when ambiguity, risk, or failures justify it
+- **Delegation Gate + Anti-Pattern Guard** — prevents orchestrator from doing specialist work
+- **Memory Retrieval Protocol** — file-based memory, no external servers required
+- **Shared Cognitive Kernel** — 3-tier reasoning (FAST/DELIBERATE/SLOW) with budget enforcement
 - **Prompt Enhancement Protocol** — silently clarifies vague prompts (1-2 questions max)
 - **Multi-Agent Chains** — sequential requests execute automatically, max depth 4
 - **Council Fan-Out Protocol** — structured advocate-for / advocate-against / judge arbitration that inherits the active model by default

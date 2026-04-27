@@ -240,8 +240,10 @@ function validateModelConfiguration(config) {
     .filter(([, agentConfig]) => Object.prototype.hasOwnProperty.call(agentConfig, "model"))
     .map(([agentName]) => agentName);
 
-  if (overriddenAgents.length > 0) {
-    errors.push(`Default config should let agents inherit the active orchestrator/session model; remove explicit model override(s): ${overriddenAgents.join(", ")}`);
+  // Council agents may have explicit model overrides for multi-LLM consensus
+  const nonCouncilOverrides = overriddenAgents.filter(a => !a.startsWith("council"));
+  if (nonCouncilOverrides.length > 0) {
+    errors.push(`Default config should let non-council agents inherit the active orchestrator/session model; remove explicit model override(s): ${nonCouncilOverrides.join(", ")}`);
   }
 
   if (config.provider?.openrouter?.options?.apiKey === "YOUR_OPENROUTER_KEY") {
@@ -255,34 +257,17 @@ function validateRuntimeMemorySurface(config) {
   const errors = [];
   const warnings = [];
 
-  for (const serverName of ["engram", "mempalace", "brain-router"]) {
-    if (!config.mcp?.[serverName]?.enabled) {
-      errors.push(`opencode.json missing enabled memory MCP server: ${serverName}`);
-    }
+  // Self-contained architecture: file-based memory, no external MCP required
+  // Optional MCP servers are allowed but not required
+  const hasMcp = Object.prototype.hasOwnProperty.call(config, "mcp");
+  if (hasMcp) {
+    warnings.push("MCP servers are optional in the self-contained architecture; remove mcp block for zero-dependency setup");
   }
 
-  if (!fs.existsSync(MEMORY_PLUGIN_PATH)) {
-    errors.push("Missing project memory plugin: .opencode/plugins/memory-context-loader.js");
-  } else {
-    const content = fs.readFileSync(MEMORY_PLUGIN_PATH, "utf8");
-
-    if (!/experimental\.chat\.system\.transform/.test(content)) {
-      errors.push("Memory plugin missing experimental.chat.system.transform hook");
-    }
-
-    if (!/engram/.test(content) || !/mempalace-mempalace_search/.test(content)) {
-      errors.push("Memory plugin missing engram or mempalace startup restore path");
-    }
-  }
-
-  if (fs.existsSync(LEGACY_MEMORY_LOADER_PATH)) {
-    const legacy = fs.readFileSync(LEGACY_MEMORY_LOADER_PATH, "utf8");
-    if (/hooks\.memory_context_loader|PreToolUse hook/i.test(legacy)) {
-      errors.push("Legacy memory loader still advertises the unsupported hooks.memory_context_loader path");
-    }
-    if (!/Runtime startup memory now lives in \.opencode\/plugins\/memory-context-loader\.js/.test(legacy)) {
-      warnings.push("Legacy memory loader should point readers at the plugin-based runtime path");
-    }
+  // Check that file-based memory paths are documented
+  const memorySystems = readUtf8("_shared/memory-systems.md");
+  if (!/~\/\.opencode\/projects/.test(memorySystems)) {
+    errors.push("shared memory systems missing file-based memory path");
   }
 
   return { label: "runtime memory startup", errors, warnings };
@@ -315,13 +300,8 @@ function validateProductSurfaces(config) {
     errors.push("shared memory systems still use checkpoint/ledger hybrid wording");
   }
 
-  if (/Use `brain-router_brain_context` at session start/i.test(memorySystems)
-    || /At session start:\s*ALWAYS call `engram_mem_context` and `brain-router_brain_context`/i.test(memorySystems)) {
-    errors.push("shared memory systems still require startup brain-router context calls");
-  }
-
-  if (!/automatic startup restore/i.test(memorySystems) || !/live lookup path/i.test(memorySystems)) {
-    warnings.push("shared memory systems should distinguish automatic startup restore from live brain-router lookups");
+  if (/brain-router_brain_query|engram_mem_context|mempalace_mempalace_search/i.test(memorySystems)) {
+    warnings.push("shared memory systems still reference MCP tools; consider migrating to file-based language");
   }
 
   const compactorSkill = readUtf8("skills/compactor/SKILL.md");

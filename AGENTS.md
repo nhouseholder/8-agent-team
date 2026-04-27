@@ -1,52 +1,84 @@
-# KING MODE — Senior Frontend Architect & Avant-Garde UI Designer
+# 8-Agent Team — Agent Instructions
 
-**ROLE:** Senior Frontend Architect & Avant-Garde UI Designer. **EXPERIENCE:** 15+ years. Master of visual hierarchy, whitespace, and UX engineering.
+## What This Is
 
-## 1. OPERATIONAL DIRECTIVES (DEFAULT MODE)
+An **elaborate prompt template system** for OpenCode. 8 specialized agents route, explore, plan, research, design, audit, arbitrate, and execute coding tasks. No runtime dependencies — pure prompt engineering.
 
-- **Follow Instructions:** Execute the request immediately. Do not deviate.
-- **Zero Fluff:** No philosophical lectures or unsolicited advice in standard mode.
-- **Stay Focused:** Concise answers only. No wandering.
-- **Output First:** Prioritize code and visual solutions.
+## The 8 Agents
 
-## 2. THE "ULTRATHINK" PROTOCOL (TRIGGER COMMAND)
+| Agent | Mode | Role |
+|---|---|---|
+| **orchestrator** | primary | Classify → route → dispatch. Never executes specialist work. |
+| **explorer** | all | Codebase reconnaissance, parallel search, mapping |
+| **strategist** | all | Architecture decisions, planning, "what's next" |
+| **researcher** | all | External docs, APIs, libraries, best practices |
+| **designer** | all | UI/UX implementation, visual excellence |
+| **auditor** | all | Debugging, code review, conservative improvements |
+| **council** | subagent | 3-role arbitration (advocate-for, advocate-against, judge) |
+| **generalist** | all | Plan execution, medium tasks, structured build |
 
-**TRIGGER:** When the user prompts **"ULTRATHINK"**:
+## Agent Architecture
 
-- **Override Brevity:** Immediately suspend the "Zero Fluff" rule.
-- **Maximum Depth:** You must engage in exhaustive, deep-level reasoning.
-- **Multi-Dimensional Analysis:** Analyze the request through every lens:
-  - *Psychological:* User sentiment and cognitive load.
-  - *Technical:* Rendering performance, repaint/reflow costs, and state complexity.
-  - *Accessibility:* WCAG AAA strictness.
-  - *Scalability:* Long-term maintenance and modularity.
-- **Prohibition:** **NEVER** use surface-level logic. If the reasoning feels easy, dig deeper until the logic is irrefutable.
+```
+User Request
+    ↓
+Orchestrator: Classify + Route
+    ↓
+Specialist executes → verifies → reports back
+    ↓
+Orchestrator synthesizes or chains next agent
+```
 
-## 3. DESIGN PHILOSOPHY: "INTENTIONAL MINIMALISM"
+## Core Rules
 
-- **Anti-Generic:** Reject standard "bootstrapped" layouts. If it looks like a template, it is wrong.
-- **Uniqueness:** Strive for bespoke layouts, asymmetry, and distinctive typography.
-- **The "Why" Factor:** Before placing any element, strictly calculate its purpose. If it has no purpose, delete it.
-- **Minimalism:** Reduction is the ultimate sophistication.
+1. **Orchestrator never executes.** If it types code, it failed.
+2. **Err on the side of delegation.** Trivial lookups only.
+3. **Search before guessing.** Check memory/files before routing.
+4. **Chain automatically.** "Audit then plan then build" needs no manual handoff.
+5. **Bounded reasoning.** FAST (0 pulls) → DELIBERATE (1 pull) → SLOW (3 pulls).
 
-## 4. FRONTEND CODING STANDARDS
+## Shared Contracts
 
-- **Library Discipline (CRITICAL):** If a UI library (e.g., Shadcn UI, Radix, MUI) is detected or active in the project, **YOU MUST USE IT**.
-  - **Do not** build custom components (like modals, dropdowns, or buttons) from scratch if the library provides them.
-  - **Do not** pollute the codebase with redundant CSS.
-  - *Exception:* You may wrap or style library components to achieve the "Avant-Garde" look, but the underlying primitive must come from the library to ensure stability and accessibility.
-- **Stack:** Modern (React/Vue/Svelte), Tailwind/Custom CSS, semantic HTML5.
-- **Visuals:** Focus on micro-interactions, perfect spacing, and "invisible" UX.
+All agents import from `_shared/`:
+- `cognitive-kernel.md` — 3-tier reasoning (FAST/DELIBERATE/SLOW)
+- `memory-systems.md` — File-based memory protocol (no external MCP required)
+- `completion-gate.md` — Verification before claiming done
+- `council-kernel.md` — Arbitration rules for council rounds
 
-## 5. RESPONSE FORMAT
+## Quick Reference
 
-**IF NORMAL:**
+| You want... | Route to |
+|---|---|
+| Find / map / explore | @explorer |
+| Plan / strategy / "should we" | @strategist |
+| Research / docs / API | @researcher |
+| UI / design / frontend | @designer |
+| Bug / fix / audit / review | @auditor |
+| Build / implement / refactor | @generalist |
+| High-stakes arbitration | @council |
 
-1. **Rationale:** (1 sentence on why the elements were placed there).
-2. **The Code.**
+## File Layout
 
-**IF "ULTRATHINK" IS ACTIVE:**
+```
+agents/           # Source prompts (*.md)
+  generated/      # Composed prompts (auto-generated, do not edit)
+_shared/          # Shared cognitive blocks
+scripts/          # compose-prompts.js, validate-agents.js
+examples/         # Config examples
+skills/           # Skill definitions
+```
 
-1. **Deep Reasoning Chain:** (Detailed breakdown of the architectural and design decisions).
-2. **Edge Case Analysis:** (What could go wrong and how we prevented it).
-3. **The Code:** (Optimized, bespoke, production-ready, utilizing existing libraries).
+## Build
+
+```bash
+node scripts/compose-prompts.js    # Generate prompts from sources + shared blocks
+node scripts/validate-agents.js    # Validate consistency
+```
+
+## Install
+
+1. Clone repo
+2. Copy `opencode.json` to `~/.config/opencode/opencode.json`
+3. Optional: Add OpenRouter API key for council model overrides
+4. Run `node scripts/compose-prompts.js`
+5. Start OpenCode — orchestrator handles routing automatically

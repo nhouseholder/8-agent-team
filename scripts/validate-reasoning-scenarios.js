@@ -17,7 +17,8 @@ function scenario(label, checks) {
 function runScenarioChecks() {
   const orchestrator = read("agents/orchestrator.md");
   const cognitiveKernel = read("_shared/cognitive-kernel.md");
-  const memoryPlugin = read(".opencode/plugins/memory-context-loader.js");
+  // Self-contained architecture: no external MCP plugin required
+  const memoryPlugin = ""; // Disabled — file-based memory replaces plugin
   const specialists = [
     "explorer.md",
     "strategist.md",
@@ -100,16 +101,12 @@ function runScenarioChecks() {
     ]),
     scenario("startup memory runtime surface", [
       {
-        pass: /experimental\.chat\.system\.transform/.test(memoryPlugin),
-        message: "startup memory plugin missing system-transform hook",
+        pass: /~\/\.opencode\/projects/.test(memorySystems),
+        message: "shared memory systems missing file-based memory path",
       },
       {
-        pass: /engram/.test(memoryPlugin) && /mempalace-mempalace_search/.test(memoryPlugin),
-        message: "startup memory plugin missing engram or mempalace restore path",
-      },
-      {
-        pass: /brain-router MCP tools live/i.test(memoryPlugin),
-        message: "startup memory plugin missing explicit brain-router live-lookup fallback",
+        pass: /Session start.*read.*memory|read.*session memory/i.test(memorySystems),
+        message: "shared memory systems missing session-start file read protocol",
       },
     ]),
     scenario("delegation packet metadata", [
@@ -208,8 +205,10 @@ function runScenarioChecks() {
         message: "opencode.json should not define an unsupported top-level models block",
       },
       {
-        pass: Object.values(opencode.agent || {}).every((agentConfig) => !Object.prototype.hasOwnProperty.call(agentConfig, "model")),
-        message: "opencode.json should let all agents inherit the active orchestrator/session model by default",
+        pass: Object.entries(opencode.agent || {}).every(([agentName, agentConfig]) =>
+          !Object.prototype.hasOwnProperty.call(agentConfig, "model") || agentName.startsWith("council")
+        ),
+        message: "opencode.json should let non-council agents inherit the active orchestrator/session model by default",
       },
     ]),
   ];

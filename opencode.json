@@ -1,27 +1,6 @@
 {
   "$schema": "https://opencode.ai/config.json",
   "model": "opencode/kimi-k2.6",
-  "mcp": {
-    "brain-router": {
-      "type": "local",
-      "command": [
-        "brain-router"
-      ],
-      "environment": {
-        "BRAIN_PROJECT": "global",
-        "ENGRAM_DB": "{env:HOME}/.engram/engram.db"
-      },
-      "enabled": true
-    },
-    "engram": {
-      "type": "local",
-      "command": [
-        "engram",
-        "mcp"
-      ],
-      "enabled": true
-    }
-  },
   "agent": {
     "orchestrator": {
       "mode": "primary",
@@ -81,7 +60,7 @@
   "provider": {
     "openrouter": {
       "options": {
-        "apiKey": "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"
+        "apiKey": "YOUR_OPENROUTER_KEY"
       }
     }
   }

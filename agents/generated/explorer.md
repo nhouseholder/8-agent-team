@@ -22,7 +22,7 @@ Quick contextual grep for codebases. Answer "Where is X?", "Find Y", "Which file
 
 ## Shared Runtime Contract
 <!-- BEGIN GENERATED BLOCK: shared-cognitive-kernel (_shared/cognitive-kernel.md) -->
-## COGNITIVE KERNEL v2.0 — 3-Tier Reasoning Contract (MANDATORY)
+## COGNITIVE KERNEL v2.1 — 3-Tier Reasoning Contract (MANDATORY)
 
 Every core agent uses the same graduated reasoning contract so routing, memory use, and verification stay consistent across the system. This is a Kahneman-style control heuristic for agent behavior, not a claim that the repo faithfully models settled human dual-process psychology.
 
@@ -54,15 +54,14 @@ Every core agent uses the same graduated reasoning contract so routing, memory u
 ---
 
 ## 3. Memory Preflight
-- Session start: use automatic startup restore when available; if you need a manual refresh, call `engram_mem_context` explicitly.
-- Before non-trivial work: query `brain-router_brain_query` first.
-- If the task touches a known project, recurring bug, or past decision: follow with `engram_mem_search`.
-- Use `engram_mem_timeline` when chronological context around a past decision is needed.
+- Session start: read the most recent session memory file from `~/.opencode/projects/<project>/memory/sessions/` when available.
+- Before non-trivial work: search project memory files for relevant decisions and patterns.
+- If the task touches a known project, recurring bug, or past decision: read the specific memory file.
 - Check `thoughts/ledgers/codebase-map.json` if present. Use it to:
   - Confirm module boundaries before assuming file organization
   - Identify hot files when investigating regressions
   - Cross-check entry points when verifying deployment scope
-- Treat `brain-router_brain_context` as an on-demand structured-memory refresh, not mandatory startup ceremony.
+- Treat project memory as an on-demand structured refresh, not mandatory startup ceremony.
 - If retrieved memory conflicts with live repo evidence or fresh tool output, follow the shared precedence rules in `_shared/memory-systems.md` instead of inventing a local rule.
 
 ---
@@ -97,9 +96,9 @@ Use FAST when the task is narrow, familiar, low-risk, and can be completed in on
 - Do not trigger multi-step research or analysis unless a slow-mode signal appears.
 - If the gist depends on missing evidence, stale memory, or conflicting signals, escalate to DELIBERATE.
 
-**Definition of "evidence pull":** One tool call that returns new information: `read`, `grep`, `glob`, `brain-router_brain_query`, `engram_mem_search`, `engram_mem_timeline`, `webfetch`. Re-reading a previously read file does NOT count as a new pull.
+**Definition of "evidence pull":** One tool call or file read that returns new information: `read`, `grep`, `glob`, `search`, `fetch`, or reading a memory file. Re-reading a previously read file does NOT count as a new pull.
 
-**Memory calls count.** The 3-call retrieval budget in `_shared/memory-systems.md` is a SUBSET of the evidence budget. Memory preflight calls (brain_query, mempalace_search, mem_search) consume evidence pulls. A FAST-mode agent that uses `brain-router_brain_query` has used its 0-pull budget and must proceed. A DELIBERATE-mode agent that uses `brain-router_brain_query` + `mempalace_mempalace_search` has used 2 pulls and has 1 remaining.
+**Memory calls count.** The 3-call retrieval budget in `_shared/memory-systems.md` is a SUBSET of the evidence budget. Memory preflight calls (searching memory files, reading session history) consume evidence pulls. A FAST-mode agent that reads one memory file has used its 0-pull budget and must proceed. A DELIBERATE-mode agent that searches memory + reads a session file has used 2 pulls and has 1 remaining.
 
 ---
 
@@ -156,6 +155,7 @@ Do not move backwards to earlier phases unless materially new evidence appears.
 - Prefer the minimum extra evidence needed to change the call. If the current anchor plus up to 3 additional reads cannot change the decision, stop reading.
 - Do not expand the work merely because the model can produce more analysis. More tokens are not more certainty.
 - `slow` on a naturally deliberative model should usually still feel concise: bounded evidence, explicit trade-offs, immediate terminal state.
+- Specialists make a single forward pass, then choose one of three terminal states: done, ask, or escalate. No repeated slow-mode cycles on unchanged evidence.
 
 ---
 
@@ -216,9 +216,9 @@ If you cannot answer these, lower confidence or escalate.
 
 After successfully solving a novel problem in DELIBERATE or SLOW mode:
 
-1. Save the pattern via `engram_mem_save` with a stable `topic_key` (e.g., `architecture/auth-model`, `bugfix/fts5-special-chars`)
+1. Save the pattern to a project memory file with a stable topic key (e.g., `architecture/auth-model`, `bugfix/fts5-special-chars`)
 2. Include: **What** was done, **Why** it worked, **Where** files affected, **Learned** gotchas
-3. This caches the DELIBERATE/SLOW solution so FAST mode can find it via `brain-router_brain_query` next time
+3. This caches the DELIBERATE/SLOW solution so FAST mode can find it next time
 4. Only save genuine patterns — not trivial changes or one-off fixes
 
 **Goal:** Successful slow patterns graduate to fast skills. The framework gets faster over time.
@@ -239,7 +239,7 @@ MODE_CALIBRATION:
   would_fast_have_sufficed: [yes|no|uncertain]
 ```
 
-Save this to `engram_mem_save` with `topic_key: "reasoning/calibration"`.
+Save this to a project memory file under `reasoning/calibration.md`.
 
 **Purpose:** Build empirical data on which tasks actually need which mode. Over time, this enables data-driven mode assignment instead of heuristic guessing.
 
@@ -290,171 +290,106 @@ When forecasting, estimating, or predicting outcomes:
 <!-- BEGIN GENERATED BLOCK: shared-memory-systems (_shared/memory-systems.md) -->
 ## MEMORY SYSTEMS (MANDATORY)
 
-You have access to two persistent memory systems via MCP tools:
+You have a persistent memory system implemented as **file-based memory**. No external servers or MCP tools required.
 
-1. **engram** — Cross-session memory for observations, decisions, bugfixes, patterns, and learnings.
-   - Use `engram_mem_search` to find past decisions, bugs fixed, patterns, or context from previous sessions
-   - Use `engram_mem_context` when you need an explicit recent-context refresh beyond the automatic startup restore
-   - Use `engram_mem_save` to save important observations (decisions, architecture, bugfixes, patterns)
-   - Use `engram_mem_timeline` to understand chronological context around an observation
-   - ALWAYS search engram before starting work on a project you've touched before
+### Storage Locations
 
-2. **brain-router** — Unified memory router that auto-routes between structured facts and conversation history.
-   - Use `brain-router_brain_query` for any memory lookup (auto-routes to the right store)
-   - Use `brain-router_brain_save` to save structured facts with conflict detection
-   - Use `brain-router_brain_context` only when you intentionally need a live structured-memory refresh inside the session
+| Type | Path | Purpose |
+|---|---|---|
+| Project memory | `~/.opencode/projects/<project>/memory/` | Per-project decisions, bugfixes, patterns |
+| Session memory | `~/.opencode/projects/<project>/memory/sessions/` | Session summaries and checkpoints |
+| Codebase map | `thoughts/ledgers/codebase-map.json` | Auto-generated repo structure (if present) |
+| Pre-compact checkpoint | `~/.opencode/projects/<project>/memory/pre_compact_checkpoint.md` | Emergency state before context compaction |
 
-**Mempalace (READ-ONLY):** Mempalace semantic search is available but is a **read-only** retrieval path. Do NOT write to mempalace. All writes go through engram or brain-router.
-   - Use `mempalace_mempalace_search` for semantic/verbatim recall when engram summaries are insufficient
-   - Use `mempalace_mempalace_list_wings` and `mempalace_mempalace_list_rooms` to explore structure
-   - Use `mempalace_mempalace_traverse` to follow cross-wing connections between related topics
-   - Use `mempalace_mempalace_kg_query` for knowledge graph queries about entities and relationships
+### Read Protocol
 
-**RULES:**
-- At session start: rely on automatic startup restore when available; otherwise call `engram_mem_context` explicitly. Treat brain-router as a live lookup path, not mandatory startup ceremony.
-- Before working on known projects: ALWAYS search engram for prior decisions and patterns
-- **MANDATORY CHECKPOINTS** (3 triggers — see orchestrator's Mandatory Memory Checkpoint Protocol):
-  - **C1 Pre-Compaction**: Save to `engram_mem_save` + `~/.opencode/projects/<project>/memory/pre_compact_checkpoint.md` before ANY compaction
-  - **C2 Post-Delegation**: Save specialist's key finding to `engram_mem_save` after notable results
-  - **C3 Session-End**: Save full summary via `engram_mem_session_summary` + `brain-router_brain_save`
-- **Do NOT write to mempalace.** All writes go through engram (`engram_mem_save`, `engram_mem_session_summary`) or brain-router (`brain-router_brain_save`).
-- When uncertain about past decisions: search before guessing
-- Memory systems survive across sessions — use them to maintain continuity
+1. **Project framing** — determine project, subsystem, and question first
+2. **Read project memory** — scan `~/.opencode/projects/<project>/memory/` for relevant files
+3. **Read session history** — check `sessions/` for recent context
+4. **Read codebase map** — if `thoughts/ledgers/codebase-map.json` exists, use it to confirm module boundaries
 
-## Retrieval Order (MANDATORY)
+**Retrieval budget: Max 3 file reads per routing decision.**
 
-Use the memory systems in this order unless the task explicitly needs something else:
-
-1. **Project and task framing** — determine project, subsystem, and question first
-2. **`brain-router_brain_query`** — fastest broad lookup across structured memory and conversation history
-3. **`engram_mem_search`** or **`engram_mem_context`** — structured observations, decisions, bugfixes, patterns
-4. **`mempalace_mempalace_search`** — semantic/verbatim recall when engram summaries are insufficient
-5. **`engram_mem_timeline`** — when sequence matters more than isolated facts
-
-**Why engram before mempalace:** Engram returns structured, actionable summaries. Mempalace is a fallback for verbatim detail when summaries are insufficient.
-
-## Retrieval Budget & Circuit Breaker (MANDATORY)
-
-**Hard limit: Max 3 memory tool calls per routing decision.**
-
-| Call # | Tool | Purpose | Stop Condition |
-|---|---|---|---|
-| 1 | `brain-router_brain_query` | Fast broad lookup | If result answers the question → STOP |
-| 2 | `engram_mem_search` or `engram_mem_context` | Structured observations / recent context | If summaries contain the answer → READ THEM, STOP. If not, proceed with available info. |
-| 3 | `mempalace_mempalace_search` | Semantic/verbatim recall fallback | If result contains the answer → READ IT, STOP. If not, proceed with available info. |
+| Call # | Action | Stop Condition |
+|---|---|---|
+| 1 | Scan memory directory for relevant topic files | If answer found → STOP |
+| 2 | Read specific memory file(s) matching topic | If summaries contain answer → STOP |
+| 3 | Read session history or codebase map | If result helps → STOP. If not, proceed with available info. |
 
 **Rules:**
-- **No get_observation in the budget.** `engram_mem_get_observation` is NOT part of the 3-call limit. It was the escape hatch that caused 40-call loops. If summaries are insufficient after 3 calls, proceed with available info.
-- **Search returned nothing?** Proceed with available info. Do not expand search with broader queries.
-- **Circuit breaker:** After 3 calls, budget is exhausted. Proceed with whatever you have. Do not make additional memory calls for the same routing decision.
-- **No retry loops.** If a memory call fails or returns empty, that counts toward the 3-call budget. Move on.
+- After 3 reads, budget is exhausted. Proceed with whatever you have.
+- No retry loops. If a file is missing or empty, that counts toward the budget. Move on.
+- Trust summaries. Do not read full files "just to be thorough."
 
-## Trust Summaries Rule (MANDATORY)
+### Write Protocol
 
-`engram_mem_context` and `engram_mem_search` return **summaries**, not full content.
+Save important observations as markdown files in the project memory directory.
 
-**Read the summaries. Stop there.**
+**Topic key shape for filenames:**
+- `project-<project>-decision-<topic>.md`
+- `project-<project>-bugfix-<topic>.md`
+- `project-<project>-pattern-<topic>.md`
+- `session-<project>-<YYYY-MM-DD>.md`
 
-- If the summary answers your question → STOP. Do NOT fetch the full observation.
-- If the summary is unclear but you have enough context to proceed → STOP.
-- Only fetch full content via `engram_mem_get_observation` if:
-  - The summary explicitly references a specific file path or code snippet you need
-  - The summary contains a decision or bugfix where the exact rationale matters
-  - AND you have not already exhausted your 3-call retrieval budget
+**Content format:**
+```markdown
+## Compiled Truth
+**What**: [concise description]
+**Why**: [reasoning or problem]
+**Where**: [files/paths affected]
+**Learned**: [gotchas or edge cases]
 
-**Anti-pattern:** Fetching full observations for every search result "just to be thorough." This is what caused the 40-call loop. Summaries are designed to be sufficient. Trust them.
+---
+## Timeline
+- 2026-04-26T17:00:00: Initial implementation
 
-## Save Conventions
-
-Keep memory entries easy to retrieve by project, topic, and date.
-
-- **Topic key shape**:
-   - `project/<project>/decision/<topic>`
-   - `project/<project>/bugfix/<topic>`
-   - `project/<project>/pattern/<topic>`
-   - `session/<project>/<YYYY-MM-DD>`
-- **Titles** should start with the project or agent when possible
-- **Content** should capture what changed, why, and the exact next step — not raw logs
-- **Do not save** tool transcripts, duplicate file contents, or dead-end exploration
-
-## Validation Rules (enforced by brain-router)
-
-The `brain_save` tool enforces these rules automatically:
-
-| Rule | Behavior |
-|---|---|
-| **Valid types** | `decision`, `architecture`, `bugfix`, `pattern`, `config`, `learning`, `manual` |
-| **topic_key required** | Mandatory for `decision`, `architecture`, `bugfix`, `pattern`, `config` |
-| **topic_key format** | `^[a-z0-9_-]+(/[a-z0-9_-]+)*$` — lowercase, hyphens, slashes only |
-| **Structured content** | Warn if `content` lacks `**` markers (structured format recommended) |
-| **No `discovery` type** | Reserved for auto-distill (disabled); use `manual` or `learning` instead |
-
-**Example structured save:**
-```json
-{
-  "title": "Fixed auth loop on token refresh",
-  "content": "**What**: Replaced synchronous token refresh with async queue\n**Why**: Multiple concurrent requests triggered overlapping refreshes\n**Where**: src/auth/refresh.ts, src/middleware/auth.ts\n**Learned**: Always debounce token refresh; never rely on client-side clock",
-  "type": "bugfix",
-  "topic_key": "project/myapp/bugfix/auth-refresh-race"
-}
+## Auto-Links
+- src/auth/refresh.ts
+- TokenRefreshQueue
 ```
 
-## Representation Model
+**Mandatory Checkpoints:**
+- **C1 Pre-Compaction**: Save checkpoint to `pre_compact_checkpoint.md` before ANY compaction
+- **C2 Post-Delegation**: Save specialist's key finding after notable results
+- **C3 Session-End**: Save full session summary to `sessions/YYYY-MM-DD.md`
 
-- `Gist` = the shortest action-guiding representation: decision, constraint, route, or hypothesis.
-- `Detail` = the evidence needed to verify or challenge the gist: file paths, snippets, logs, timestamps, quoted text.
-- Save gist first, then attach only enough detail or references to reconstruct or falsify it later.
-- Engram and brain-router should prefer durable gist plus refs. Mempalace and the checkpoint file remain the place to recover verbatim detail.
-
-## Conflict Resolution
-
-Use this when retrieved memory, live repo evidence, and fresh research disagree.
+### Conflict Resolution
 
 | Priority | Source | Default role |
 |---|---|---|
-| 1 | Live repo evidence and fresh tool output | Current code, tests, diagnostics, runtime behavior |
-| 2 | Fresh official docs or fresh external research | Current truth for third-party APIs and services |
-| 3 | Structured memory (brain-router / engram) | Past decisions, patterns, bugfixes, session context |
-| 4 | Verbatim memory (mempalace, checkpoint files, notes) | Exact wording, historical detail, quoted context |
+| 1 | Live repo evidence and fresh tool output | Current code, tests, diagnostics |
+| 2 | Fresh official docs or external research | Current truth for third-party APIs |
+| 3 | Structured memory (project memory files) | Past decisions, patterns, bugfixes |
+| 4 | Verbatim memory (session files, notes) | Exact wording, historical detail |
 
-- Specialists may detect conflicts, but the orchestrator owns routing and final arbitration.
 - Prefer the highest-priority source that can be directly verified now.
-- Fresh official docs can outrank stale repo comments or stale memory when the question is about external behavior.
-- Do not average contradictions. Write the competing claims, choose one with reason, or escalate.
-- If a conflict remains material after one pass, escalate to orchestrator; high-stakes unresolved conflicts may escalate to council once.
-- After resolution, save the winning gist plus the losing claims or references so future agents do not rediscover the same contradiction.
+- Do not average contradictions. Write competing claims, choose one with reason, or escalate.
+- After resolution, save the winning gist plus losing claims so future agents don't rediscover the same contradiction.
 
-## Session Rhythm
+### Session Rhythm
 
-- **Session start**: use automatic startup restore when available, then search the active project explicitly
+- **Session start**: read session memory from the most recent session file
 - **Mid-session**: save only at C1/C2 checkpoints or when a decision would be expensive to rediscover
-- **Session end**: write one durable summary keyed to project and date so the next session can resume without re-discovery
+- **Session end**: write one durable summary keyed to project and date
 
-## Confidence Gate (MANDATORY — all agents)
+### Confidence Gate (MANDATORY — all agents)
 
-**Design philosophy:** Confidence is verified by signals, not self-reported. Agents verify their work against objective signals before claiming success.
-
-### Verification Signals
-Before claiming a task is complete, check these signals:
+**Verification Signals:**
 
 | Signal | Check | Green | Red |
 |---|---|---|---|
-| **tool_call_coverage** | Did you use the right tools for the task? | Used all relevant tools (read, edit, verify) | Skipped verification tools |
-| **test_pass_rate** | Do tests pass? | All tests pass or no tests exist | Tests fail or were skipped when they shouldn't be |
-| **lsp_clean** | Any LSP errors in changed files? | `lsp_diagnostics` returns clean | Errors found in changed files |
-| **conflict_resolution** | Were conflicting signals resolved? | Source conflict resolved or escalated | Memory, repo, or research conflict ignored |
-| **output_scope_ratio** | Did you address everything requested? | All requirements addressed | Partial implementation, TODOs left |
+| **tool_call_coverage** | Did you use the right tools for the task? | Used all relevant tools | Skipped verification |
+| **test_pass_rate** | Do tests pass? | All tests pass or none exist | Tests fail or skipped |
+| **lsp_clean** | Any LSP errors in changed files? | Clean | Errors found |
+| **conflict_resolution** | Were conflicting signals resolved? | Resolved or escalated | Ignored |
+| **output_scope_ratio** | Did you address everything requested? | All requirements addressed | Partial implementation |
 
-### Confidence Assessment
-- **Signals clear** (all green): Proceed, claim completion
-- **Signals concern** (any red): Note the concern, attempt fix, or escalate
-
-### Low Confidence Protocol
+**Low Confidence Protocol:**
 When signals show concern:
-1. Do NOT claim the task is complete
+1. Do NOT claim completion
 2. Identify which signals are red
 3. If fixable: attempt fix, re-verify
-4. If not fixable: escalate to @auditor or ask user for direction
+4. If not fixable: escalate to @auditor or ask user
 <!-- END GENERATED BLOCK: shared-memory-systems -->
 <!-- BEGIN GENERATED BLOCK: shared-completion-gate (_shared/completion-gate.md) -->
 ## COMPLETION GATE (MANDATORY)
